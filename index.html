@@ -3,10 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>چرتکه</title>
+<title>چرتکه | مدیریت مالی خانواده</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;font-family:Tahoma,Arial;color:#263248}
+header{background:#183b56;color:white;padding:24px 18px;border-radius:0 0 22px 22px}
+header h1{margin:0 0 8px;font-size:25px}
+header p{margin:0;color:#d5e5f1;font-size:13px}
+.container{padding:16px;max-width:650px;margin:auto}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:white;padding:17px;border-radius:15px;box-shadow:0 2px 8px #0000000b}
+.card small{color:#788397}
+.card strong{display:block;font-size:19px;margin-top:12px}
+.balance{grid-column:span 2;background:#e4f1f8}
+.green{color:#168451}
+.red{color:#d34c4c}
+h3{margin-top:25px}
+form,.box{background:white;padding:17px;border-radius:15px;margin-top:12px}
+input,select,button{width:100%;padding:13px;margin-top:10px;border:1px solid #dce1e9;border-radius:9px;font-family:inherit;font-size:14px}
+button{background:#183b56;color:white;border:0;cursor:pointer}
+button.secondary{background:#e8eef4;color:#183b56}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:white;padding:14px;margin-top:9px;border-radius:12px;display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.item small{display:block;color:#788397;margin-top:7px}
+.actions{display:flex;gap:8px;margin-top:15px}
+.actions button{flex:1}
+footer{text-align:center;color:#8792a3;font-size:11px;padding:25px}
+</style>
 </head>
 <body>
-<h1>به چرتکه خوش آمدید</h1>
-<p>مدیریت هوشمند درآمدها و هزینه‌های خانوار</p>
+
+<header>
+<h1>🧮 چرتکه</h1>
+<p>مدیریت درآمد و هزینه خانواده</p>
+</header>
+
+<div class="container">
+
+<div class="cards">
+<div class="card balance">
+<small>موجودی کل</small>
+<strong id="balance">۰ تومان</strong>
+</div>
+<div class="card">
+<small>مجموع درآمد</small>
+<strong class="green" id="income">۰</strong>
+</div>
+<div class="card">
+<small>مجموع هزینه</small>
+<strong class="red" id="expense">۰</strong>
+</div>
+</div>
+
+<h3>ثبت تراکنش جدید</h3>
+
+<form id="form">
+<select id="type">
+<option value="income">درآمد</option>
+<option value="expense">هزینه</option>
+</select>
+
+<input id="amount" type="number" min="1" placeholder="مبلغ به تومان" required>
+
+<input id="title" type="text" placeholder="شرح تراکنش" required>
+
+<select id="category">
+<option>حقوق</option>
+<option>خوراک</option>
+<option>حمل و نقل</option>
+<option>قبوض</option>
+<option>درمان</option>
+<option>آموزش</option>
+<option>خرید</option>
+<option>تفریح</option>
+<option>سایر</option>
+</select>
+
+<input id="date" type="date" required>
+
+<button type="submit">ثبت تراکنش</button>
+</form>
+
+<h3>تراکنش‌های اخیر</h3>
+<div id="transactions"></div>
+
+<h3>پشتیبان‌گیری اطلاعات</h3>
+<div class="box">
+<p style="font-size:13px;line-height:2">
+برای حفظ اطلاعات، می‌توانی از داده‌ها نسخه پشتیبان تهیه کنی.
+</p>
+<button onclick="backup()">دریافت نسخه پشتیبان</button>
+<button class="secondary" onclick="document.getElementById('restore').click()">بازیابی نسخه پشتیبان</button>
+<input id="restore" type="file" accept=".json" hidden>
+</div>
+
+<footer>چرتکه | نسخه اولیه 1.0</footer>
+
+</div>
+
+<script>
+const KEY = "chortkeh_database";
+const VERSION = 1;
+
+function loadDB(){
+ try{
+  const db=JSON.parse(localStorage.getItem(KEY));
+  if(!db || !Array.isArray(db.transactions)) return {version:VERSION,transactions:[]};
+  if(db.version > VERSION) throw new Error("نسخه اطلاعات جدیدتر است");
+  return db;
+ }catch(e){
+  return {version:VERSION,transactions:[]};
+ }
+}
+
+let db=loadDB();
+
+function saveDB(){
+ db.version=VERSION;
+ localStorage.setItem(KEY,JSON.stringify(db));
+}
+
+const money=n=>new Intl.NumberFormat('fa-IR').format(n)+" تومان";
+
+function render(){
+ let inc=0,exp=0;
+ db.transactions.forEach(t=>{
+  if(t.type==="income") inc+=t.amount;
+  else exp+=t.amount;
+ });
+
+ document.getElementById("income").textContent=money(inc);
+ document.getElementById("expense").textContent=money(exp);
+ document.getElementById("balance").textContent=money(inc-exp);
+
+ const list=document.getElementById("transactions");
+ list.innerHTML="";
+
+ [...db.transactions].reverse().forEach(t=>{
+  const div=document.createElement("div");
+  div.className="item";
+
+  const info=document.createElement("div");
+  const name=document.createElement("b");
+  name.textContent=t.title;
+  const details=document.createElement("small");
+  details.textContent=t.category+" | "+t.date;
+  info.append(name,details);
+
+  const amount=document.createElement("b");
+  amount.className=t.type==="income"?"green":"red";
+  amount.textContent=(t.type==="income"?"+":"-")+money(t.amount);
+
+  div.append(info,amount);
+  list.appendChild(div);
+ });
+
+ if(!db.transactions.length){
+  list.textContent="هنوز تراکنشی ثبت نشده است.";
+ }
+}
+
+document.getElementById("date").value=
+ new Date().toISOString().slice(0,10);
+
+document.getElementById("form").addEventListener("submit",e=>{
+ e.preventDefault();
+
+ const amount=Number(document.getElementById("amount").value);
+ const title=document.getElementById("title").value.trim();
+
+ if(!Number.isSafeInteger(amount)||amount<=0){
+  alert("مبلغ معتبر وارد کن");
+  return;
+ }
+
+ db.transactions.push({
+  id:crypto.randomUUID(),
+  type:document.getElementById("type").value,
+  amount,
+  title,
+  category:document.getElementById("category").value,
+  date:document.getElementById("date").value
+ });
+
+ saveDB();
+ e.target.reset();
+ document.getElementById("date").value=new Date().toISOString().slice(0,10);
+ render();
+});
+
+function backup(){
+ const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="chortkeh-backup.json";
+ a.click();
+ URL.revokeObjectURL(url);
+}
+
+document.getElementById("restore").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+
+ try{
+  const restored=JSON.parse(await file.text());
+  if(!restored || restored.version!==VERSION ||
+     !Array.isArray(restored.transactions) ||
+     !restored.transactions.every(t=>
+      ["income","expense"].includes(t.type) &&
+      Number.isSafeInteger(t.amount) && t.amount>0 &&
+      typeof t.title==="string" &&
+      typeof t.category==="string" &&
+      typeof t.date==="string")){
+   throw new Error();
+  }
+
+  if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟")){
+   db=restored;
+   saveDB();
+   render();
+   alert("بازیابی انجام شد");
+  }
+ }catch{
+  alert("فایل پشتیبان معتبر نیست");
+ }
+ e.target.value="";
+});
+
+render();
+</script>
+
 </body>
 </html>
