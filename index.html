@@ -97,28 +97,67 @@ footer{text-align:center;color:#8792a3;font-size:11px;padding:25px}
 <input id="restore" type="file" accept=".json" hidden>
 </div>
 
-<footer>چرتکه | نسخه اولیه 1.0</footer>
+<footer>چرتکه | نسخه 1.1</footer>
 
 </div>
 
 <script>
 const KEY = "chortkeh_database";
-const VERSION = 1;
+const VERSION = 2;
+let storageReady = true;
+
+function emptyDB(){
+ return {version:VERSION, transactions:[], categories:["حقوق","خوراک","حمل و نقل","قبوض","درمان","آموزش","خرید","تفریح","سایر"]};
+}
+
+function validTransaction(t){
+ return !!t && ["income","expense"].includes(t.type) &&
+  Number.isSafeInteger(t.amount) && t.amount>0 &&
+  typeof t.title==="string" && typeof t.category==="string" &&
+  typeof t.date==="string" && /^\d{4}-\d{2}-\d{2}$/.test(t.date);
+}
+
+function migrateDB(oldDB){
+ if(!oldDB || !Array.isArray(oldDB.transactions) ||
+    !oldDB.transactions.every(validTransaction)) throw new Error("ساختار اطلاعات معتبر نیست");
+ if(!Number.isInteger(oldDB.version) || oldDB.version>VERSION || oldDB.version<1)
+  throw new Error("نسخه اطلاعات پشتیبانی نمی‌شود");
+ // نسخه ۱ فقط تراکنش‌ها را داشت؛ داده‌ها بدون حذف یا تغییر منتقل می‌شوند.
+ const migrated={...oldDB,version:VERSION,transactions:oldDB.transactions.map(t=>({
+  id:typeof t.id==="string" && t.id ? t.id : crypto.randomUUID(),
+  type:t.type, amount:t.amount, title:t.title, category:t.category, date:t.date
+ }))};
+ migrated.categories=Array.isArray(oldDB.categories)?oldDB.categories:emptyDB().categories;
+ return migrated;
+}
 
 function loadDB(){
+ const raw=localStorage.getItem(KEY);
+ if(raw===null) return emptyDB();
  try{
-  const db=JSON.parse(localStorage.getItem(KEY));
-  if(!db || !Array.isArray(db.transactions)) return {version:VERSION,transactions:[]};
-  if(db.version > VERSION) throw new Error("نسخه اطلاعات جدیدتر است");
-  return db;
- }catch(e){
-  return {version:VERSION,transactions:[]};
+  const parsed=JSON.parse(raw);
+  return migrateDB(parsed);
+ }catch(err){
+  storageReady=false;
+  showStorageError("اطلاعات ذخیره‌شده قابل خواندن یا تبدیل نیست. برای جلوگیری از پاک‌شدن داده‌ها، ثبت و ذخیره غیرفعال شده است. ابتدا از داده خام نسخه پشتیبان بگیرید.");
+  return emptyDB();
  }
+}
+
+function showStorageError(message){
+ const box=document.createElement("div");
+ box.id="storageError";
+ box.style.cssText="background:#fff0f0;color:#9b2525;padding:14px;margin:14px 16px;border-radius:12px;line-height:2;font-size:13px";
+ box.textContent=message;
+ document.querySelector(".container").prepend(box);
+ const form=document.getElementById("form");
+ if(form) form.querySelectorAll("input,select,button").forEach(el=>el.disabled=true);
 }
 
 let db=loadDB();
 
 function saveDB(){
+ if(!storageReady) throw new Error("ذخیره‌سازی به دلیل خطای اطلاعات غیرفعال است");
  db.version=VERSION;
  localStorage.setItem(KEY,JSON.stringify(db));
 }
@@ -127,110 +166,77 @@ const money=n=>new Intl.NumberFormat('fa-IR').format(n)+" تومان";
 
 function render(){
  let inc=0,exp=0;
- db.transactions.forEach(t=>{
-  if(t.type==="income") inc+=t.amount;
-  else exp+=t.amount;
- });
-
+ db.transactions.forEach(t=>{ if(t.type==="income") inc+=t.amount; else exp+=t.amount; });
  document.getElementById("income").textContent=money(inc);
  document.getElementById("expense").textContent=money(exp);
  document.getElementById("balance").textContent=money(inc-exp);
-
  const list=document.getElementById("transactions");
  list.innerHTML="";
-
  [...db.transactions].reverse().forEach(t=>{
-  const div=document.createElement("div");
-  div.className="item";
-
+  const div=document.createElement("div"); div.className="item";
   const info=document.createElement("div");
-  const name=document.createElement("b");
-  name.textContent=t.title;
-  const details=document.createElement("small");
-  details.textContent=t.category+" | "+t.date;
+  const name=document.createElement("b"); name.textContent=t.title;
+  const details=document.createElement("small"); details.textContent=t.category+" | "+t.date;
   info.append(name,details);
-
-  const amount=document.createElement("b");
-  amount.className=t.type==="income"?"green":"red";
+  const amount=document.createElement("b"); amount.className=t.type==="income"?"green":"red";
   amount.textContent=(t.type==="income"?"+":"-")+money(t.amount);
-
-  div.append(info,amount);
-  list.appendChild(div);
+  div.append(info,amount); list.appendChild(div);
  });
-
- if(!db.transactions.length){
-  list.textContent="هنوز تراکنشی ثبت نشده است.";
- }
+ if(!db.transactions.length) list.textContent="هنوز تراکنشی ثبت نشده است.";
 }
 
-document.getElementById("date").value=
- new Date().toISOString().slice(0,10);
-
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
 document.getElementById("form").addEventListener("submit",e=>{
- e.preventDefault();
-
+ e.preventDefault(); if(!storageReady) return;
  const amount=Number(document.getElementById("amount").value);
  const title=document.getElementById("title").value.trim();
-
- if(!Number.isSafeInteger(amount)||amount<=0){
-  alert("مبلغ معتبر وارد کن");
-  return;
- }
-
- db.transactions.push({
-  id:crypto.randomUUID(),
-  type:document.getElementById("type").value,
-  amount,
-  title,
-  category:document.getElementById("category").value,
-  date:document.getElementById("date").value
- });
-
- saveDB();
- e.target.reset();
- document.getElementById("date").value=new Date().toISOString().slice(0,10);
- render();
+ if(!Number.isSafeInteger(amount)||amount<=0){alert("مبلغ معتبر وارد کن");return;}
+ if(!title){alert("شرح تراکنش را وارد کن");return;}
+ db.transactions.push({id:crypto.randomUUID(),type:document.getElementById("type").value,amount,title,category:document.getElementById("category").value,date:document.getElementById("date").value});
+ try{saveDB();}catch(err){alert("ذخیره اطلاعات ناموفق بود: "+err.message);return;}
+ e.target.reset(); document.getElementById("date").value=new Date().toISOString().slice(0,10); render();
 });
 
+function downloadText(filename,text,mime){
+ const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
+ const a=document.createElement("a"); a.href=url; a.download=filename; a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function backup(){
- const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");
- a.href=url;
- a.download="chortkeh-backup.json";
- a.click();
- URL.revokeObjectURL(url);
+ const raw=localStorage.getItem(KEY);
+ if(raw===null){alert("هنوز اطلاعاتی برای پشتیبان‌گیری وجود ندارد.");return;}
+ downloadText("chortkeh-backup-v"+VERSION+".json",raw,"application/json");
+}
+
+// در صورت خرابی ساختار، امکان نجات داده خام بدون دست‌کاری آن فراهم است.
+if(!storageReady){
+ const rescue=document.createElement("button"); rescue.className="secondary";
+ rescue.textContent="دریافت نسخه خام اطلاعات ذخیره‌شده";
+ rescue.onclick=()=>downloadText("chortkeh-raw-recovery.txt",localStorage.getItem(KEY)||"","text/plain");
+ document.querySelector("#storageError").appendChild(rescue);
 }
 
 document.getElementById("restore").addEventListener("change",async e=>{
- const file=e.target.files[0];
- if(!file)return;
-
+ const file=e.target.files[0]; if(!file)return;
  try{
-  const restored=JSON.parse(await file.text());
-  if(!restored || restored.version!==VERSION ||
-     !Array.isArray(restored.transactions) ||
-     !restored.transactions.every(t=>
-      ["income","expense"].includes(t.type) &&
-      Number.isSafeInteger(t.amount) && t.amount>0 &&
-      typeof t.title==="string" &&
-      typeof t.category==="string" &&
-      typeof t.date==="string")){
-   throw new Error();
+  const restored=migrateDB(JSON.parse(await file.text()));
+  if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟ پیشنهاد می‌شود ابتدا از اطلاعات فعلی نسخه پشتیبان بگیرید.")){
+   // پیش از جایگزینی، نسخه فعلی در حافظه مرورگر برای بازگشت نگه داشته می‌شود.
+   const current=localStorage.getItem(KEY);
+   if(current!==null) localStorage.setItem(KEY+"_before_restore_"+Date.now(),current);
+   localStorage.setItem(KEY,JSON.stringify(restored)); db=restored; storageReady=true;
+   document.getElementById("storageError")?.remove();
+   document.getElementById("form").querySelectorAll("input,select,button").forEach(el=>el.disabled=false);
+   render(); alert("بازیابی انجام شد");
   }
-
-  if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟")){
-   db=restored;
-   saveDB();
-   render();
-   alert("بازیابی انجام شد");
-  }
- }catch{
-  alert("فایل پشتیبان معتبر نیست");
- }
+ }catch(err){alert("فایل پشتیبان معتبر یا قابل پشتیبانی نیست. اطلاعات فعلی تغییر نکرد.");}
  e.target.value="";
 });
 
+// ثبت نسخه مهاجرت‌شده تنها پس از تبدیل موفق انجام می‌شود.
+if(storageReady){
+ try{saveDB();}catch(err){storageReady=false;showStorageError("ذخیره نسخه جدید ناموفق بود؛ اطلاعات قبلی دست‌نخورده باقی مانده است.");}
+}
 render();
 </script>
 
