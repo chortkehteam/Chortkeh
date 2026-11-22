@@ -3,242 +3,293 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f7fb">
 <title>چرتکه | مدیریت مالی خانواده</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f5f9;font-family:Tahoma,Arial;color:#263248}
-header{background:#183b56;color:white;padding:24px 18px;border-radius:0 0 22px 22px}
-header h1{margin:0 0 8px;font-size:25px}
-header p{margin:0;color:#d5e5f1;font-size:13px}
-.container{padding:16px;max-width:650px;margin:auto}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{background:white;padding:17px;border-radius:15px;box-shadow:0 2px 8px #0000000b}
-.card small{color:#788397}
-.card strong{display:block;font-size:19px;margin-top:12px}
-.balance{grid-column:span 2;background:#e4f1f8}
-.green{color:#168451}
-.red{color:#d34c4c}
-h3{margin-top:25px}
-form,.box{background:white;padding:17px;border-radius:15px;margin-top:12px}
-input,select,button{width:100%;padding:13px;margin-top:10px;border:1px solid #dce1e9;border-radius:9px;font-family:inherit;font-size:14px}
-button{background:#183b56;color:white;border:0;cursor:pointer}
-button.secondary{background:#e8eef4;color:#183b56}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.item{background:white;padding:14px;margin-top:9px;border-radius:12px;display:flex;justify-content:space-between;gap:8px;font-size:13px}
-.item small{display:block;color:#788397;margin-top:7px}
-.actions{display:flex;gap:8px;margin-top:15px}
-.actions button{flex:1}
-footer{text-align:center;color:#8792a3;font-size:11px;padding:25px}
+:root{--ink:#17243b;--muted:#7b879b;--line:#e9edf4;--bg:#f5f7fb;--white:#fff;--blue:#315efb;--blue2:#eaf0ff;--green:#16865b;--red:#d94d5c;--shadow:0 8px 28px rgba(25,42,75,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif;font-size:14px}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:86px}
+.top{padding:22px 18px 18px;background:linear-gradient(135deg,#1d3471,#315efb);color:white;border-radius:0 0 26px 26px}
+.topline{display:flex;align-items:center;justify-content:space-between}.brand{font-size:21px;font-weight:800}.datehint{font-size:11px;color:#dce5ff;margin-top:5px}
+.avatar{width:38px;height:38px;border-radius:13px;background:#ffffff22;display:grid;place-items:center;font-size:18px}
+.balancebox{margin-top:23px}.balancebox small{color:#dce5ff}.balancebox strong{display:block;font-size:27px;margin-top:8px;letter-spacing:-.5px}
+.balancefoot{display:flex;gap:22px;margin-top:18px}.balancefoot div{font-size:11px;color:#dce5ff}.balancefoot b{display:block;color:white;font-size:14px;margin-top:5px}
+main{padding:18px}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px}.sectionhead h2{font-size:16px;margin:0}.muted{color:var(--muted);font-size:11px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.quick button{background:white;border:1px solid var(--line);border-radius:17px;padding:13px 5px 11px;color:var(--ink);box-shadow:var(--shadow);font-size:11px}.ico{width:38px;height:38px;margin:0 auto 8px;border-radius:13px;display:grid;place-items:center;font-size:19px;background:var(--blue2)}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:white;border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat b{display:block;font-size:16px;margin-top:9px}.green{color:var(--green)}.red{color:var(--red)}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow)}
+.tx{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);gap:10px}.tx:last-child{border:0}.txname{font-weight:700;font-size:13px}.txmeta{color:var(--muted);font-size:10px;margin-top:6px}.txamount{font-weight:700;font-size:12px;white-space:nowrap}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}.navinner{width:min(720px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px max(8px,env(safe-area-inset-bottom))}.nav button{background:none;color:var(--muted);font-size:10px;padding:6px}.nav button span{display:block;font-size:19px;margin-bottom:4px}.nav button.active{color:var(--blue);font-weight:bold}
+.page{display:none}.page.active{display:block}
+.btn{background:var(--blue);color:white;border-radius:12px;padding:13px 16px;font-weight:700}.btn.secondary{background:var(--blue2);color:var(--blue)}.btn.light{background:#f0f2f7;color:var(--ink)}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.field input,.field select{width:100%;padding:13px;border:1px solid #dfe5ef;border-radius:12px;background:#fff;color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:var(--blue)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formactions{display:flex;gap:9px}.formactions>*{flex:1}
+.chips{display:flex;gap:8px;overflow:auto;padding:2px 0 10px}.chip{white-space:nowrap;border:1px solid var(--line);background:white;border-radius:20px;padding:9px 13px;font-size:11px;color:var(--muted)}.chip.active{background:var(--blue2);border-color:#d5dfff;color:var(--blue);font-weight:bold}
+.reportrow{display:flex;justify-content:space-between;align-items:center;padding:15px 2px;border-bottom:1px solid var(--line);cursor:pointer}.reportrow:last-child{border:0}.reportrow b{font-size:13px}.reportrow small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.arrow{color:#9aa5b7;font-size:18px}
+.back{background:none;color:var(--blue);padding:8px 0;font-weight:bold}.empty{text-align:center;padding:25px 10px;color:var(--muted);font-size:12px}
+.note{background:#fff8e8;color:#8b651c;border-radius:12px;padding:12px;font-size:11px;line-height:1.9;margin-top:12px}
+.hidden{display:none!important}footer{text-align:center;color:#a0a9b8;font-size:10px;padding:25px}
+@media(max-width:380px){main{padding:14px}.quick{gap:6px}.quick button{font-size:10px}.balancebox strong{font-size:23px}}
 </style>
 </head>
 <body>
-
-<header>
-<h1>🧮 چرتکه</h1>
-<p>مدیریت درآمد و هزینه خانواده</p>
+<div class="app">
+<header class="top">
+ <div class="topline"><div><div class="brand">🧮 چرتکه</div><div class="datehint">مدیریت مالی خانواده</div></div><div class="avatar">⌂</div></div>
+ <div class="balancebox"><small>موجودی کل</small><strong id="balance">۰ تومان</strong>
+  <div class="balancefoot"><div>درآمد این برنامه<b id="income">۰ تومان</b></div><div>هزینه این برنامه<b id="expense">۰ تومان</b></div></div>
+ </div>
 </header>
+<main>
+<section id="homePage" class="page active">
+ <div class="sectionhead"><h2>دسترسی سریع</h2><span class="muted">ثبت و مدیریت</span></div>
+ <div class="quick">
+  <button onclick="showPage('addPage')"><div class="ico">＋</div>ثبت هزینه</button>
+  <button onclick="showPage('addPage','income')"><div class="ico">↗</div>ثبت درآمد</button>
+  <button onclick="showPage('reportPage')"><div class="ico">▥</div>گزارش‌ها</button>
+  <button onclick="showPage('addPage','expense','اجاره')"><div class="ico">⌂</div>اجاره</button>
+  <button onclick="showPage('addPage','expense','اقساط')"><div class="ico">▤</div>اقساط</button>
+  <button onclick="showPage('addPage','expense','حمل‌ونقل')"><div class="ico">🚕</div>حمل‌ونقل</button>
+  <button onclick="showPage('transactionsPage')"><div class="ico">↔</div>تراکنش‌ها</button>
+  <button onclick="showPage('settingsPage')"><div class="ico">⚙</div>پشتیبان‌گیری</button>
+ </div>
+ <div class="sectionhead"><h2>خلاصه مالی</h2><span class="muted">بر اساس همه تراکنش‌ها</span></div>
+ <div class="summary"><div class="stat"><small>مجموع درآمد</small><b class="green" id="income2">۰</b></div><div class="stat"><small>مجموع هزینه</small><b class="red" id="expense2">۰</b></div></div>
+ <div class="sectionhead"><h2>آخرین تراکنش‌ها</h2><button class="back" onclick="showPage('transactionsPage')">مشاهده همه ←</button></div>
+ <div class="panel" id="recent"></div>
+</section>
 
-<div class="container">
+<section id="addPage" class="page">
+ <div class="sectionhead"><h2>ثبت تراکنش</h2><span class="muted">ساده و سریع</span></div>
+ <div class="panel">
+  <form id="form">
+   <div class="chips"><button type="button" class="chip active" data-type="expense">هزینه</button><button type="button" class="chip" data-type="income">درآمد</button></div>
+   <div class="field"><label>مبلغ (تومان)</label><input id="amount" type="number" min="1" step="1" required placeholder="مثلاً ۲۵۰۰۰۰"></div>
+   <div class="field"><label>عنوان یا نام دقیق مورد</label><input id="title" required placeholder="مثلاً شیر، آبمیوه یا کرایه تاکسی"></div>
+   <div class="formgrid">
+    <div class="field"><label>دسته اصلی</label><select id="category"></select></div>
+    <div class="field"><label>زیرگروه</label><select id="subcategory"></select></div>
+   </div>
+   <div class="field"><label>ثبت‌کننده</label><input id="person" placeholder="نام عضو خانواده (اختیاری)"></div>
+   <div class="formgrid">
+    <div class="field"><label>مقدار (اختیاری)</label><input id="quantity" type="number" min="0" step="any" placeholder="مثلاً ۲"></div>
+    <div class="field"><label>واحد</label><input id="unit" placeholder="کیلو، لیتر، عدد..."></div>
+   </div>
+   <div class="field"><label>تاریخ شمسی</label><div class="formgrid"><select id="jy" aria-label="سال شمسی"></select><select id="jm" aria-label="ماه شمسی"></select></div><select id="jd" aria-label="روز شمسی" style="width:100%;margin-top:9px;padding:13px;border:1px solid #dfe5ef;border-radius:12px;background:#fff;color:var(--ink)"></select><input id="date" type="hidden" required><div class="muted" id="jalaliPreview" style="margin-top:7px">تاریخ به تقویم شمسی</div></div>
+   <div class="formactions"><button class="btn" type="submit">ثبت تراکنش</button><button class="btn light" type="reset">پاک کردن</button></div>
+  </form>
+ </div>
+ <div class="panel" style="margin-top:12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+   <div><b>ثبت فاکتور با عکس</b><div class="muted" style="margin-top:6px">این قابلیت فعلاً غیرفعال است.</div></div>
+   <button type="button" class="btn light" style="white-space:nowrap" onclick="alert('این قابلیت به‌زودی فعال می‌شود.')">🔒 به‌زودی</button>
+  </div>
+ </div>
+</section>
 
-<div class="cards">
-<div class="card balance">
-<small>موجودی کل</small>
-<strong id="balance">۰ تومان</strong>
+<section id="reportPage" class="page">
+ <div class="sectionhead"><h2>گزارش هزینه‌ها</h2><span class="muted">نمای کلی</span></div>
+ <div class="panel"><div class="muted" style="margin-bottom:8px">برای دیدن جزئیات، یک دسته را انتخاب کن.</div><div id="reportContent"></div></div>
+</section>
+
+<section id="transactionsPage" class="page">
+ <div class="sectionhead"><h2>همه تراکنش‌ها</h2><span class="muted" id="txCount"></span></div>
+ <div class="panel" id="allTransactions"></div>
+</section>
+
+<section id="settingsPage" class="page">
+ <div class="sectionhead"><h2>پشتیبان‌گیری و تنظیمات</h2></div>
+ <div class="panel">
+  <p style="font-size:12px;line-height:2;color:var(--muted)">برای حفظ اطلاعات، قبل از نصب نسخه‌های بعدی یک فایل پشتیبان بگیر. این نسخه همچنان اطلاعات را در حافظه همین مرورگر ذخیره می‌کند.</p>
+  <button class="btn" style="width:100%" onclick="backup()">دریافت نسخه پشتیبان</button>
+  <button class="btn secondary" style="width:100%;margin-top:9px" onclick="document.getElementById('restore').click()">بازیابی نسخه پشتیبان</button>
+  <div class="sectionhead"><h2>مدیریت دسته‌بندی‌ها</h2><span class="muted">افزودن و ویرایش</span></div>
+  <div id="categoryManager"></div>
+  <button class="btn" style="width:100%;margin-top:10px" onclick="addCategory()">＋ افزودن دسته اصلی</button>
+  <input id="restore" type="file" accept=".json" class="hidden">
+  <div class="note">اطلاعات هنوز بین گوشی‌های مختلف همگام‌سازی نمی‌شود. پاک‌کردن داده‌های مرورگر ممکن است اطلاعات را از دسترس خارج کند.</div>
+ </div>
+</section>
+<footer>چرتکه · نسخه ۱.۳.۰ · پیش‌نمایش در حال توسعه</footer>
+</main>
 </div>
-<div class="card">
-<small>مجموع درآمد</small>
-<strong class="green" id="income">۰</strong>
-</div>
-<div class="card">
-<small>مجموع هزینه</small>
-<strong class="red" id="expense">۰</strong>
-</div>
-</div>
-
-<h3>ثبت تراکنش جدید</h3>
-
-<form id="form">
-<select id="type">
-<option value="income">درآمد</option>
-<option value="expense">هزینه</option>
-</select>
-
-<input id="amount" type="number" min="1" placeholder="مبلغ به تومان" required>
-
-<input id="title" type="text" placeholder="شرح تراکنش" required>
-
-<select id="category">
-<option>حقوق</option>
-<option>خوراک</option>
-<option>حمل و نقل</option>
-<option>قبوض</option>
-<option>درمان</option>
-<option>آموزش</option>
-<option>خرید</option>
-<option>تفریح</option>
-<option>سایر</option>
-</select>
-
-<input id="date" type="date" required>
-
-<button type="submit">ثبت تراکنش</button>
-</form>
-
-<h3>تراکنش‌های اخیر</h3>
-<div id="transactions"></div>
-
-<h3>پشتیبان‌گیری اطلاعات</h3>
-<div class="box">
-<p style="font-size:13px;line-height:2">
-برای حفظ اطلاعات، می‌توانی از داده‌ها نسخه پشتیبان تهیه کنی.
-</p>
-<button onclick="backup()">دریافت نسخه پشتیبان</button>
-<button class="secondary" onclick="document.getElementById('restore').click()">بازیابی نسخه پشتیبان</button>
-<input id="restore" type="file" accept=".json" hidden>
-</div>
-
-<footer>چرتکه | نسخه 1.1</footer>
-
-</div>
-
+<nav class="nav"><div class="navinner">
+ <button class="active" data-page="homePage"><span>⌂</span>خانه</button>
+ <button data-page="addPage"><span>＋</span>ثبت</button>
+ <button data-page="reportPage"><span>▥</span>گزارش</button>
+ <button data-page="settingsPage"><span>⚙</span>تنظیمات</button>
+</div></nav>
 <script>
-const KEY = "chortkeh_database";
-const VERSION = 2;
-let storageReady = true;
-
-function emptyDB(){
- return {version:VERSION, transactions:[], categories:["حقوق","خوراک","حمل و نقل","قبوض","درمان","آموزش","خرید","تفریح","سایر"]};
+const KEY="chortkeh_database", VERSION=3;
+const DEFAULTS={
+ "خوراک":["لبنیات","حبوبات","نان و غلات","گوشت و مرغ","میوه و سبزیجات","تنقلات","نوشیدنی‌ها","روغن"],
+ "اجاره":[],"حمل‌ونقل":["تاکسی","بنزین","تعمیر و نگهداری"],"اقساط":[],
+ "قبوض":["آب","برق","گاز","تلفن و اینترنت"],"درمان":["دارو","ویزیت"],
+ "پوشاک":["لباس","کفش"],"آموزش":["شهریه","لوازم‌التحریر"],"تفریح":["رستوران","سفر"],"سایر":[]
+};
+const LEGACY=["حقوق","خوراک","حمل و نقل","قبوض","درمان","آموزش","خرید","تفریح","سایر"];
+function emptyDB(){return {version:VERSION,transactions:[],categories:[...LEGACY],categoryConfig:{...Object.fromEntries(Object.entries(DEFAULTS).map(([k,v])=>[k,[...v]])),...Object.fromEntries(LEGACY.map(k=>[k,[]]))},archivedCategories:[],archivedSubcategories:{}};}
+function validTx(t){return t&&["income","expense"].includes(t.type)&&Number.isSafeInteger(t.amount)&&t.amount>0&&typeof t.title==="string"&&typeof t.category==="string"&&typeof t.date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(t.date);}
+function migrate(data){
+ if(!data||!Array.isArray(data.transactions)||!data.transactions.every(validTx))throw Error("ساختار اطلاعات معتبر نیست");
+ if(!Number.isInteger(data.version)||data.version>VERSION||data.version<1)throw Error("نسخه اطلاعات پشتیبانی نمی‌شود");
+ const out={...data,version:VERSION,transactions:data.transactions.map(t=>({...t,id:typeof t.id==="string"&&t.id?t.id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()))}))};
+ if(!Array.isArray(out.categories))out.categories=[];
+ if(!out.categoryConfig||typeof out.categoryConfig!=="object")out.categoryConfig={};
+ if(!Array.isArray(out.archivedCategories))out.archivedCategories=[];
+ if(!out.archivedSubcategories||typeof out.archivedSubcategories!=="object")out.archivedSubcategories={};
+ Object.entries(DEFAULTS).forEach(([c,subs])=>{if(!Array.isArray(out.categoryConfig[c]))out.categoryConfig[c]=[...subs];});
+ out.categories.forEach(c=>{if(typeof c==="string"&&!Array.isArray(out.categoryConfig[c]))out.categoryConfig[c]=[];});
+ out.transactions.forEach(t=>{if(!Array.isArray(out.categoryConfig[t.category]))out.categoryConfig[t.category]=[];if(t.subcategory&&!out.categoryConfig[t.category].includes(t.subcategory))out.categoryConfig[t.category].push(t.subcategory);});
+ return out;
 }
-
-function validTransaction(t){
- return !!t && ["income","expense"].includes(t.type) &&
-  Number.isSafeInteger(t.amount) && t.amount>0 &&
-  typeof t.title==="string" && typeof t.category==="string" &&
-  typeof t.date==="string" && /^\d{4}-\d{2}-\d{2}$/.test(t.date);
-}
-
-function migrateDB(oldDB){
- if(!oldDB || !Array.isArray(oldDB.transactions) ||
-    !oldDB.transactions.every(validTransaction)) throw new Error("ساختار اطلاعات معتبر نیست");
- if(!Number.isInteger(oldDB.version) || oldDB.version>VERSION || oldDB.version<1)
-  throw new Error("نسخه اطلاعات پشتیبانی نمی‌شود");
- // نسخه ۱ فقط تراکنش‌ها را داشت؛ داده‌ها بدون حذف یا تغییر منتقل می‌شوند.
- const migrated={...oldDB,version:VERSION,transactions:oldDB.transactions.map(t=>({
-  id:typeof t.id==="string" && t.id ? t.id : crypto.randomUUID(),
-  type:t.type, amount:t.amount, title:t.title, category:t.category, date:t.date
- }))};
- migrated.categories=Array.isArray(oldDB.categories)?oldDB.categories:emptyDB().categories;
- return migrated;
-}
-
-function loadDB(){
+let db,storageReady=true;
+try{
  const raw=localStorage.getItem(KEY);
- if(raw===null) return emptyDB();
- try{
+ if(raw===null){db=emptyDB();}
+ else {
   const parsed=JSON.parse(raw);
-  return migrateDB(parsed);
- }catch(err){
-  storageReady=false;
-  showStorageError("اطلاعات ذخیره‌شده قابل خواندن یا تبدیل نیست. برای جلوگیری از پاک‌شدن داده‌ها، ثبت و ذخیره غیرفعال شده است. ابتدا از داده خام نسخه پشتیبان بگیرید.");
-  return emptyDB();
+  // Keep an untouched copy before any older database is migrated or rewritten.
+  if(parsed && Number.isInteger(parsed.version) && parsed.version<VERSION){
+   const backupKey=KEY+"_pre_migration_v"+parsed.version+"_"+Date.now();
+   localStorage.setItem(backupKey,raw);
+  }
+  db=migrate(parsed);
+ }
+}catch(e){storageReady=false;db=emptyDB();}
+function save(){if(!storageReady)throw Error("ذخیره‌سازی برای محافظت از اطلاعات غیرفعال است");db.version=VERSION;localStorage.setItem(KEY,JSON.stringify(db));}
+function money(n){return new Intl.NumberFormat("fa-IR").format(n)+" تومان";}
+function displayDate(s){if(!s)return "";const d=new Date(s+"T12:00:00");return new Intl.DateTimeFormat("fa-IR-u-ca-persian",{year:"numeric",month:"short",day:"numeric"}).format(d);}
+function allCats(includeArchived=false){const names=[...new Set([...Object.keys(db.categoryConfig||{}),...db.transactions.map(t=>t.category)])];return names.filter(c=>includeArchived||!(db.archivedCategories||[]).includes(c));}
+function subCats(cat,includeArchived=false){const names=[...new Set([...(db.categoryConfig?.[cat]||DEFAULTS[cat]||[]),...db.transactions.filter(t=>t.category===cat&&t.subcategory).map(t=>t.subcategory)])];const archived=db.archivedSubcategories?.[cat]||[];return names.filter(x=>includeArchived||!archived.includes(x));}
+function txNode(t){const div=document.createElement("div");div.className="tx";const a=document.createElement("div");const n=document.createElement("div");n.className="txname";n.textContent=t.title;const m=document.createElement("div");m.className="txmeta";m.textContent=[t.category,t.subcategory,t.person,displayDate(t.date)].filter(Boolean).join(" · ");a.append(n,m);const v=document.createElement("div");v.className="txamount "+(t.type==="income"?"green":"red");v.textContent=(t.type==="income"?"+":"−")+money(t.amount);div.append(a,v);return div;}
+function render(){
+ const inc=db.transactions.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0), exp=db.transactions.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+ ["income","income2"].forEach(id=>document.getElementById(id).textContent=money(inc));
+ ["expense","expense2"].forEach(id=>document.getElementById(id).textContent=money(exp));
+ document.getElementById("balance").textContent=money(inc-exp);
+ const recent=document.getElementById("recent"),all=document.getElementById("allTransactions");recent.innerHTML="";all.innerHTML="";
+ [...db.transactions].reverse().slice(0,5).forEach(t=>recent.append(txNode(t)));
+ [...db.transactions].reverse().forEach(t=>all.append(txNode(t)));
+ if(!db.transactions.length){recent.innerHTML='<div class="empty">هنوز تراکنشی ثبت نشده است.</div>';all.innerHTML='<div class="empty">هنوز تراکنشی ثبت نشده است.</div>';}
+ document.getElementById("txCount").textContent=new Intl.NumberFormat("fa-IR").format(db.transactions.length)+" مورد";
+ renderReports();
+}
+let reportPath=[];
+function renderReports(){
+ const el=document.getElementById("reportContent");el.innerHTML="";
+ const expenses=db.transactions.filter(t=>t.type==="expense");
+ if(!reportPath.length){
+  const cats=[...new Set([...allCats(true),...expenses.map(t=>t.category)])];
+  cats.forEach(c=>{const amount=expenses.filter(t=>t.category===c).reduce((s,t)=>s+t.amount,0);const count=expenses.filter(t=>t.category===c).length;const row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(c)}</b><small>${new Intl.NumberFormat("fa-IR").format(count)} تراکنش</small></div><div><b>${money(amount)}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[c];renderReports()};el.append(row);});
+ }else if(reportPath.length===1){
+  const c=reportPath[0];const back=document.createElement("button");back.className="back";back.textContent="→ بازگشت به دسته‌ها";back.onclick=()=>{reportPath=[];renderReports()};el.append(back);
+  const subs=[...new Set([...subCats(c,true),...expenses.filter(t=>t.category===c&&(!t.subcategory)).map(t=>"بدون زیرگروه")])];
+  if(!subs.length){el.insertAdjacentHTML("beforeend",'<div class="empty">هنوز جزئیاتی در این دسته ثبت نشده است.</div>');}
+  subs.forEach(s=>{const list=expenses.filter(t=>t.category===c&&(s==="بدون زیرگروه"?!t.subcategory:t.subcategory===s));const amount=list.reduce((a,t)=>a+t.amount,0);const row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(s)}</b><small>${new Intl.NumberFormat("fa-IR").format(list.length)} تراکنش</small></div><div><b>${money(amount)}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[c,s];renderReports()};el.append(row);});
+ }else{
+  const [c,s]=reportPath;const back=document.createElement("button");back.className="back";back.textContent="→ بازگشت به "+c;back.onclick=()=>{reportPath=[c];renderReports()};el.append(back);
+  const list=expenses.filter(t=>t.category===c&&(s==="بدون زیرگروه"?!t.subcategory:t.subcategory===s));
+  list.forEach(t=>el.append(txNode(t)));if(!list.length)el.insertAdjacentHTML("beforeend",'<div class="empty">تراکنشی ثبت نشده است.</div>');
  }
 }
-
-function showStorageError(message){
- const box=document.createElement("div");
- box.id="storageError";
- box.style.cssText="background:#fff0f0;color:#9b2525;padding:14px;margin:14px 16px;border-radius:12px;line-height:2;font-size:13px";
- box.textContent=message;
- document.querySelector(".container").prepend(box);
- const form=document.getElementById("form");
- if(form) form.querySelectorAll("input,select,button").forEach(el=>el.disabled=true);
-}
-
-let db=loadDB();
-
-function saveDB(){
- if(!storageReady) throw new Error("ذخیره‌سازی به دلیل خطای اطلاعات غیرفعال است");
- db.version=VERSION;
- localStorage.setItem(KEY,JSON.stringify(db));
-}
-
-const money=n=>new Intl.NumberFormat('fa-IR').format(n)+" تومان";
-
-function render(){
- let inc=0,exp=0;
- db.transactions.forEach(t=>{ if(t.type==="income") inc+=t.amount; else exp+=t.amount; });
- document.getElementById("income").textContent=money(inc);
- document.getElementById("expense").textContent=money(exp);
- document.getElementById("balance").textContent=money(inc-exp);
- const list=document.getElementById("transactions");
- list.innerHTML="";
- [...db.transactions].reverse().forEach(t=>{
-  const div=document.createElement("div"); div.className="item";
-  const info=document.createElement("div");
-  const name=document.createElement("b"); name.textContent=t.title;
-  const details=document.createElement("small"); details.textContent=t.category+" | "+t.date;
-  info.append(name,details);
-  const amount=document.createElement("b"); amount.className=t.type==="income"?"green":"red";
-  amount.textContent=(t.type==="income"?"+":"-")+money(t.amount);
-  div.append(info,amount); list.appendChild(div);
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function managerButton(label,fn,cls="btn light"){const b=document.createElement("button");b.className=cls;b.textContent=label;b.style.cssText="padding:8px 10px;margin:3px;font-size:11px";b.onclick=fn;return b;}
+function refreshCategoryManager(){
+ const root=document.getElementById("categoryManager");if(!root)return;root.innerHTML="";
+ allCats(true).forEach(cat=>{const box=document.createElement("div");box.className="panel";box.style.cssText="margin:9px 0;padding:12px";
+ const head=document.createElement("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";
+ const title=document.createElement("b");title.textContent=cat+(db.archivedCategories.includes(cat)?" (بایگانی‌شده)":"");head.append(title,managerButton("تغییر نام",()=>renameCategory(cat)));
+ if(db.archivedCategories.includes(cat))head.append(managerButton("فعال‌سازی",()=>toggleArchiveCategory(cat,false)));else head.append(managerButton("بایگانی",()=>toggleArchiveCategory(cat,true)));
+ box.append(head);
+ const subs=document.createElement("div");subs.style.cssText="margin-top:8px;padding-right:10px";
+ subCats(cat,true).forEach(sub=>{const row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:7px 0;gap:5px";const name=document.createElement("span");name.textContent=sub+((db.archivedSubcategories[cat]||[]).includes(sub)?" (بایگانی‌شده)":"");row.append(name,managerButton("ویرایش",()=>renameSubcategory(cat,sub)));if((db.archivedSubcategories[cat]||[]).includes(sub))row.append(managerButton("فعال‌سازی",()=>toggleArchiveSub(cat,sub,false)));else row.append(managerButton("بایگانی",()=>toggleArchiveSub(cat,sub,true)));subs.append(row);});
+ box.append(subs,managerButton("＋ افزودن زیرگروه",()=>addSubcategory(cat),"btn secondary"));root.append(box);
  });
- if(!db.transactions.length) list.textContent="هنوز تراکنشی ثبت نشده است.";
 }
-
-document.getElementById("date").value=new Date().toISOString().slice(0,10);
+function addCategory(){const name=(prompt("نام دسته اصلی جدید:")||"").trim();if(!name)return;if(allCats(true).includes(name)){alert("این دسته از قبل وجود دارد.");return;}db.categoryConfig[name]=[];db.categories.push(name);try{save();refreshCategoryManager();populateCats(name);}catch(e){alert(e.message);}}
+function renameCategory(oldName){const name=(prompt("نام جدید دسته:",oldName)||"").trim();if(!name||name===oldName)return;if(allCats(true).includes(name)){alert("این نام از قبل وجود دارد.");return;}db.categoryConfig[name]=db.categoryConfig[oldName]||[];delete db.categoryConfig[oldName];db.transactions.forEach(t=>{if(t.category===oldName)t.category=name;});db.categories=db.categories.map(x=>x===oldName?name:x);db.archivedCategories=db.archivedCategories.map(x=>x===oldName?name:x);if(db.archivedSubcategories[oldName]){db.archivedSubcategories[name]=db.archivedSubcategories[oldName];delete db.archivedSubcategories[oldName];}save();render();refreshCategoryManager();populateCats(name);}
+function toggleArchiveCategory(cat,archive){db.archivedCategories=db.archivedCategories.filter(x=>x!==cat);if(archive)db.archivedCategories.push(cat);save();refreshCategoryManager();populateCats();}
+function addSubcategory(cat){const name=(prompt("نام زیرگروه جدید:")||"").trim();if(!name)return;if(subCats(cat,true).includes(name)){alert("این زیرگروه از قبل وجود دارد.");return;}db.categoryConfig[cat]=db.categoryConfig[cat]||[];db.categoryConfig[cat].push(name);save();refreshCategoryManager();populateCats(cat,name);}
+function renameSubcategory(cat,oldName){const name=(prompt("نام جدید زیرگروه:",oldName)||"").trim();if(!name||name===oldName)return;if(subCats(cat,true).includes(name)){alert("این نام از قبل وجود دارد.");return;}db.categoryConfig[cat]=(db.categoryConfig[cat]||[]).map(x=>x===oldName?name:x);db.transactions.forEach(t=>{if(t.category===cat&&t.subcategory===oldName)t.subcategory=name;});if(db.archivedSubcategories[cat])db.archivedSubcategories[cat]=db.archivedSubcategories[cat].map(x=>x===oldName?name:x);save();render();refreshCategoryManager();populateCats(cat,name);}
+function toggleArchiveSub(cat,sub,archive){db.archivedSubcategories[cat]=db.archivedSubcategories[cat]||[];db.archivedSubcategories[cat]=db.archivedSubcategories[cat].filter(x=>x!==sub);if(archive)db.archivedSubcategories[cat].push(sub);save();refreshCategoryManager();populateCats(cat);}
+function populateCats(selected,sub){
+ const c=document.getElementById("category"),s=document.getElementById("subcategory");c.innerHTML="";
+ allCats().forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;c.append(o)});
+ if(selected&&allCats().includes(selected))c.value=selected;
+ populateSubs(sub);
+}
+function populateSubs(selected){
+ const c=document.getElementById("category").value,s=document.getElementById("subcategory");s.innerHTML="";
+ const list=subCats(c);const none=document.createElement("option");none.value="";none.textContent="بدون زیرگروه";s.append(none);
+ list.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;s.append(o)});
+ const custom=document.createElement("option");custom.value="__new__";custom.textContent="＋ افزودن زیرگروه جدید";s.append(custom);
+ if(selected&&list.includes(selected))s.value=selected;
+}
+document.getElementById("category").addEventListener("change",()=>populateSubs());
+document.getElementById("subcategory").addEventListener("change",e=>{if(e.target.value==="__new__"){const name=prompt("نام زیرگروه جدید را وارد کن:");if(name&&name.trim()){const o=document.createElement("option");o.value=name.trim();o.textContent=name.trim();e.target.insertBefore(o,e.target.lastElementChild);e.target.value=name.trim();}else e.target.value="";}});
+let currentType="expense";
+document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>{currentType=b.dataset.type;document.querySelectorAll("[data-type]").forEach(x=>x.classList.toggle("active",x===b));});
+function showPage(id,type,cat){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="addPage"){if(type){currentType=type;document.querySelectorAll("[data-type]").forEach(x=>x.classList.toggle("active",x.dataset.type===type));}populateCats(cat);}}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+// Persian calendar picker; dates are stored internally as Gregorian ISO dates for compatibility.
+function g2j(gy,gm,gd){
+ const gdm=[0,31,59,90,120,151,181,212,243,273,304,334];
+ let gy2=gm>2?gy+1:gy;
+ let days=355666+365*gy+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)+gd+gdm[gm-1];
+ let jy=-1595+33*Math.floor(days/12053);days%=12053;
+ jy+=4*Math.floor(days/1461);days%=1461;
+ if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365;}
+ let jm=days<186?1+Math.floor(days/31):7+Math.floor((days-186)/30);
+ let jd=1+(days<186?days%31:(days-186)%30);
+ return [jy,jm,jd];
+}
+function j2g(jy,jm,jd){
+ jy+=1595;
+ let days=-355668+365*jy+Math.floor(jy/33)*8+Math.floor(((jy%33)+3)/4)+jd;
+ if(jm<7)days+=(jm-1)*31;else days+=186+(jm-7)*30;
+ let gy=400*Math.floor(days/146097);days%=146097;
+ if(days>36524){gy+=100*Math.floor(--days/36524);days%=36524;if(days>=365)days++;}
+ gy+=4*Math.floor(days/1461);days%=1461;
+ if(days>365){gy+=Math.floor((days-1)/365);days=(days-1)%365;}
+ let gd=days+1,leap=(gy%4===0&&gy%100!==0)||gy%400===0;
+ const sal=[0,31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
+ let gm=1;while(gm<=12&&gd>sal[gm]){gd-=sal[gm];gm++;}
+ return `${gy}-${String(gm).padStart(2,"0")}-${String(gd).padStart(2,"0")}`;
+}
+const pMonths=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+function fillSelect(sel,items,val){sel.innerHTML="";items.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;sel.append(o)});sel.value=String(val);}
+function updateJalaliDays(){
+ const jy=+document.getElementById("jy").value,jm=+document.getElementById("jm").value;
+ const max=jm<=6?31:jm<=11?30:((jy%4===3)?30:29);
+ const daySel=document.getElementById("jd"),old=+daySel.value||1;
+ fillSelect(daySel,Array.from({length:max},(_,i)=>[i+1,new Intl.NumberFormat("fa-IR").format(i+1)]),Math.min(old,max));
+ const iso=j2g(jy,jm,+daySel.value);document.getElementById("date").value=iso;
+ document.getElementById("jalaliPreview").textContent=`تاریخ انتخاب‌شده: ${new Intl.NumberFormat("fa-IR").format(jy)} ${pMonths[jm-1]} ${new Intl.NumberFormat("fa-IR").format(+daySel.value)}`;
+}
+function initJalaliPicker(iso){
+ const d=iso?new Date(iso+"T12:00:00"):new Date(),[jy,jm,jd]=g2j(d.getFullYear(),d.getMonth()+1,d.getDate());
+ fillSelect(document.getElementById("jy"),Array.from({length:31},(_,i)=>[jy-15+i,new Intl.NumberFormat("fa-IR").format(jy-15+i)]),jy);
+ fillSelect(document.getElementById("jm"),pMonths.map((m,i)=>[i+1,m]),jm);
+ fillSelect(document.getElementById("jd"),Array.from({length:31},(_,i)=>[i+1,new Intl.NumberFormat("fa-IR").format(i+1)]),jd);
+ updateJalaliDays();
+}
+["jy","jm","jd"].forEach(id=>document.getElementById(id).addEventListener("change",updateJalaliDays));
+initJalaliPicker();
 document.getElementById("form").addEventListener("submit",e=>{
- e.preventDefault(); if(!storageReady) return;
- const amount=Number(document.getElementById("amount").value);
- const title=document.getElementById("title").value.trim();
- if(!Number.isSafeInteger(amount)||amount<=0){alert("مبلغ معتبر وارد کن");return;}
- if(!title){alert("شرح تراکنش را وارد کن");return;}
- db.transactions.push({id:crypto.randomUUID(),type:document.getElementById("type").value,amount,title,category:document.getElementById("category").value,date:document.getElementById("date").value});
- try{saveDB();}catch(err){alert("ذخیره اطلاعات ناموفق بود: "+err.message);return;}
- e.target.reset(); document.getElementById("date").value=new Date().toISOString().slice(0,10); render();
+ e.preventDefault();if(!storageReady){alert("برای محافظت از اطلاعات، ثبت تراکنش غیرفعال است.");return;}
+ const amount=Number(document.getElementById("amount").value),title=document.getElementById("title").value.trim();
+ if(!Number.isSafeInteger(amount)||amount<=0||!title){alert("مبلغ و عنوان معتبر وارد کن.");return;}
+ const tx={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),type:currentType,amount,title,category:document.getElementById("category").value,subcategory:document.getElementById("subcategory").value||"",person:document.getElementById("person").value.trim(),quantity:document.getElementById("quantity").value?Number(document.getElementById("quantity").value):null,unit:document.getElementById("unit").value.trim(),date:document.getElementById("date").value};
+ db.transactions.push(tx);try{save();}catch(err){db.transactions.pop();alert("ذخیره ناموفق بود: "+err.message);return;}
+ e.target.reset();currentType="expense";document.querySelectorAll("[data-type]").forEach(x=>x.classList.toggle("active",x.dataset.type==="expense"));
+ initJalaliPicker();populateCats();render();showPage("homePage");
 });
-
-function downloadText(filename,text,mime){
- const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
- const a=document.createElement("a"); a.href=url; a.download=filename; a.click();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function backup(){
- const raw=localStorage.getItem(KEY);
- if(raw===null){alert("هنوز اطلاعاتی برای پشتیبان‌گیری وجود ندارد.");return;}
- downloadText("chortkeh-backup-v"+VERSION+".json",raw,"application/json");
-}
-
-// در صورت خرابی ساختار، امکان نجات داده خام بدون دست‌کاری آن فراهم است.
-if(!storageReady){
- const rescue=document.createElement("button"); rescue.className="secondary";
- rescue.textContent="دریافت نسخه خام اطلاعات ذخیره‌شده";
- rescue.onclick=()=>downloadText("chortkeh-raw-recovery.txt",localStorage.getItem(KEY)||"","text/plain");
- document.querySelector("#storageError").appendChild(rescue);
-}
-
-document.getElementById("restore").addEventListener("change",async e=>{
- const file=e.target.files[0]; if(!file)return;
- try{
-  const restored=migrateDB(JSON.parse(await file.text()));
-  if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟ پیشنهاد می‌شود ابتدا از اطلاعات فعلی نسخه پشتیبان بگیرید.")){
-   // پیش از جایگزینی، نسخه فعلی در حافظه مرورگر برای بازگشت نگه داشته می‌شود.
-   const current=localStorage.getItem(KEY);
-   if(current!==null) localStorage.setItem(KEY+"_before_restore_"+Date.now(),current);
-   localStorage.setItem(KEY,JSON.stringify(restored)); db=restored; storageReady=true;
-   document.getElementById("storageError")?.remove();
-   document.getElementById("form").querySelectorAll("input,select,button").forEach(el=>el.disabled=false);
-   render(); alert("بازیابی انجام شد");
-  }
- }catch(err){alert("فایل پشتیبان معتبر یا قابل پشتیبانی نیست. اطلاعات فعلی تغییر نکرد.");}
- e.target.value="";
-});
-
-// ثبت نسخه مهاجرت‌شده تنها پس از تبدیل موفق انجام می‌شود.
-if(storageReady){
- try{saveDB();}catch(err){storageReady=false;showStorageError("ذخیره نسخه جدید ناموفق بود؛ اطلاعات قبلی دست‌نخورده باقی مانده است.");}
-}
-render();
+function download(name,content,type){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function backup(){const raw=localStorage.getItem(KEY);if(!raw){alert("هنوز اطلاعاتی برای پشتیبان‌گیری وجود ندارد.");return;}download("chortkeh-backup-v1.3.json",raw,"application/json");}
+document.getElementById("restore").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const restored=migrate(JSON.parse(await f.text()));if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟ ابتدا نسخه فعلی را پشتیبان بگیر.")){const old=localStorage.getItem(KEY);if(old!==null)localStorage.setItem(KEY+"_before_restore_"+Date.now(),old);localStorage.setItem(KEY,JSON.stringify(restored));db=restored;storageReady=true;render();alert("بازیابی انجام شد.");}}catch(err){alert("فایل پشتیبان معتبر نیست؛ اطلاعات فعلی تغییر نکرد.");}e.target.value="";});
+if(!storageReady){const warn=document.createElement("div");warn.className="note";warn.textContent="اطلاعات ذخیره‌شده قابل خواندن نیست؛ برای جلوگیری از بازنویسی، ثبت غیرفعال شده است. داده‌های مرورگر را پاک نکن.";document.querySelector("main").prepend(warn);document.querySelectorAll("#form input,#form select,#form button").forEach(x=>x.disabled=true);const raw=document.createElement("button");raw.className="btn secondary";raw.textContent="دریافت فایل خام اطلاعات";raw.onclick=()=>download("chortkeh-recovery.txt",localStorage.getItem(KEY)||"","text/plain");document.querySelector("#settingsPage .panel").append(raw);}
+if(storageReady){try{save();}catch(e){storageReady=false;}}
+populateCats();render();refreshCategoryManager();
 </script>
-
-</body>
-</html>
+</body></html>
