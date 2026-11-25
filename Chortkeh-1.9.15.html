@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#263b91">
+<meta name="description" content="چرتکه؛ مدیریت هزینه‌ها و امور مالی خانواده">
+<meta name="application-name" content="چرتکه">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="چرتکه">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<title>چرتکه | مدیریت مالی خانواده</title>
+<!-- Build: 1.9.12 security PIN; database schema v11 -->
+<style>
+:root{--ink:#17243b;--muted:#7b879b;--line:#e9edf4;--bg:#f5f7fb;--white:#fff;--blue:#315efb;--blue2:#eaf0ff;--green:#16865b;--red:#d94d5c;--shadow:0 8px 28px rgba(25,42,75,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif;font-size:14px}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:86px}
+.top{padding:22px 18px 18px;background:linear-gradient(135deg,#1d3471,#315efb);color:white;border-radius:0 0 26px 26px}
+.topline{display:flex;align-items:center;justify-content:space-between}.brand{font-size:21px;font-weight:800}.datehint{font-size:11px;color:#dce5ff;margin-top:5px}
+.avatar{width:38px;height:38px;border-radius:13px;background:#ffffff22;display:grid;place-items:center;font-size:18px}
+.balancebox{margin-top:18px}.balancebox small{color:#dce5ff}.balancebox strong{display:block;font-size:22px;margin-top:7px;letter-spacing:-.5px}
+.balancefoot{display:flex;gap:0;margin-top:18px;border-radius:16px;overflow:hidden;background:#ffffff18}.balancefoot div{font-size:11px;color:#fff;flex:1;padding:12px 14px;background:#2454d9}.balancefoot div+div{background:#d93652}.balancefoot b{display:block;color:white;font-size:15px;margin-top:6px}
+main{padding:18px}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px}.sectionhead h2{font-size:16px;margin:0}.muted{color:var(--muted);font-size:11px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.quick button{background:white;border:1px solid var(--line);border-radius:17px;padding:13px 5px 11px;color:var(--ink);box-shadow:var(--shadow);font-size:11px}.ico{width:38px;height:38px;margin:0 auto 8px;border-radius:13px;display:grid;place-items:center;font-size:19px;background:var(--blue2)}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:white;border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat b{display:block;font-size:16px;margin-top:9px}.green{color:var(--green)}.red{color:var(--red)}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow)}
+.tx{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);gap:10px}.tx:last-child{border:0}.txname{font-weight:700;font-size:13px}.txmeta{color:var(--muted);font-size:10px;margin-top:6px}.txamount{font-weight:700;font-size:12px;white-space:nowrap}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:5}.navinner{width:min(720px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px max(8px,env(safe-area-inset-bottom))}.nav button{background:none;color:var(--muted);font-size:10px;padding:6px}.nav button span{display:block;font-size:19px;margin-bottom:4px}.nav button.active{color:var(--blue);font-weight:bold}
+.page{display:none}.page.active{display:block}
+.btn{background:var(--blue);color:white;border-radius:12px;padding:13px 16px;font-weight:700}.btn.secondary{background:var(--blue2);color:var(--blue)}.btn.light{background:#f0f2f7;color:var(--ink)}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.field input,.field select{width:100%;padding:13px;border:1px solid #dfe5ef;border-radius:12px;background:#fff;color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:var(--blue)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formactions{display:flex;gap:9px}.formactions>*{flex:1}
+.chips{display:flex;gap:8px;overflow:auto;padding:2px 0 10px}.chip{white-space:nowrap;border:1px solid var(--line);background:white;border-radius:20px;padding:9px 13px;font-size:11px;color:var(--muted)}.chip.active{background:var(--blue2);border-color:#d5dfff;color:var(--blue);font-weight:bold}
+.reportrow{display:flex;justify-content:space-between;align-items:center;padding:15px 2px;border-bottom:1px solid var(--line);cursor:pointer}.reportrow:last-child{border:0}.reportrow b{font-size:13px}.reportrow small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.arrow{color:#9aa5b7;font-size:18px}
+.back{background:none;color:var(--blue);padding:8px 0;font-weight:bold}.empty{text-align:center;padding:25px 10px;color:var(--muted);font-size:12px}
+.note{background:#fff8e8;color:#8b651c;border-radius:12px;padding:12px;font-size:11px;line-height:1.9;margin-top:12px}
+.hidden{display:none!important}.cloudstatus{font-size:11px;line-height:1.9;padding:10px 12px;border-radius:11px;background:#f2f5fb;color:#45536c;margin:8px 0}.cloudgrid{display:grid;grid-template-columns:1fr;gap:8px}.cloudgrid input{width:100%;padding:12px;border:1px solid #dfe5ef;border-radius:10px;background:#fff}.cloudactions{display:flex;gap:8px;margin-top:8px}.cloudactions button{flex:1}footer{text-align:center;color:#a0a9b8;font-size:10px;padding:25px}
+@media(max-width:380px){main{padding:14px}.quick{gap:6px}.quick button{font-size:10px}.balancebox strong{font-size:23px}}
+
+/* Colorful home tiles and Persian-first header */
+.top{background:linear-gradient(135deg,#263b91 0%,#315efb 58%,#5978ff 100%);}
+.datehint{font-size:12px;line-height:1.8;color:#eef2ff;margin-top:7px}
+.balance-label{display:flex;align-items:center;gap:12px}.eye-btn{background:#ffffff24;color:#fff;border:1px solid #ffffff40;border-radius:50%;width:30px;height:30px;font-size:15px}
+.tile-heading{margin-top:5px}.tile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.home-tile{min-height:116px;border-radius:21px;padding:13px 7px 12px;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 9px 19px rgba(36,55,100,.13);transition:transform .15s ease}
+.home-tile:active{transform:scale(.97)}.home-tile b{font-size:12px}.home-tile small{font-size:9px;color:#ffffffdf;line-height:1.5}
+.tile-icon{width:39px;height:39px;border-radius:14px;background:#ffffff2c;border:1px solid #ffffff40;display:grid;place-items:center;font-size:22px;margin-bottom:1px}
+.tile-expense{background:linear-gradient(145deg,#ff647c,#e83d62)}.tile-income{background:linear-gradient(145deg,#20c997,#079b79)}.tile-installment{background:linear-gradient(145deg,#8d72f8,#6548d9)}.tile-transport{background:linear-gradient(145deg,#36a9f5,#1875d1)}.tile-rent{background:linear-gradient(145deg,#ffb84d,#f18a22)}.tile-family{background:linear-gradient(145deg,#21b8c6,#078b9e)}
+.family-tiles{display:contents}.family-expense-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.family-person{background:linear-gradient(145deg,#21b8c6,#078b9e)}.tile-manager{background:linear-gradient(145deg,#3978ff,#1747c8)}.expense-tile-amount{display:block;font-size:clamp(14px,4.1vw,19px);font-weight:900;line-height:1.5;direction:rtl;overflow-wrap:anywhere;color:#fff;text-shadow:0 1px 2px #0002}.home-tile .expense-tile-amount{font-size:clamp(14px,4.1vw,19px)}.home-links{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.link-tile{background:#fff;border:1px solid #e6eaf2;border-radius:14px;padding:12px;color:#46536d;font-size:11px;font-weight:bold}
+@media(max-width:380px){.tile-grid{gap:8px}.home-tile{min-height:108px;border-radius:18px}.home-tile b{font-size:11px}.home-tile small{font-size:8px}}
+
+
+.installment-intro{background:linear-gradient(135deg,#eef4ff,#f3eaff);border:0}.installment-intro p{font-size:12px;line-height:2;margin:7px 0 0;color:#52617b}
+.installment-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.installment-tab{border:1px solid var(--line);border-radius:14px;padding:13px 7px;background:#fff;color:var(--ink);font:inherit;font-size:12px;font-weight:700}.installment-tab.active{background:#315efb;color:#fff;border-color:#315efb;box-shadow:0 5px 14px #315efb33}
+.installment-source{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}.installment-source:last-child{border-bottom:0}.installment-source button{border:0;background:#eef2ff;color:#315efb;border-radius:10px;padding:8px 11px;font:inherit;font-size:11px}.installment-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:12px;line-height:2}
+
+.page-context{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 15px;padding:13px 15px;border-radius:15px;background:linear-gradient(110deg,#e9efff,#f5eaff);border:1px solid #dce5ff;color:#253d88;font-weight:800;font-size:14px;box-shadow:0 5px 14px rgba(49,94,251,.07)}
+.page-context span:last-child{font-size:10px;font-weight:500;color:#7482a6}
+
+.balancebox{display:grid;grid-template-columns:1fr 1fr;gap:9px;background:transparent;padding:0;box-shadow:none;margin-top:12px}
+.balance-half{min-width:0;border-radius:16px;padding:13px 12px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow)}
+.balance-blue{background:linear-gradient(145deg,#2875f0,#174fc4);color:#fff}
+.balance-red{background:linear-gradient(145deg,#ff647c,#d92f50);color:#fff}
+.balance-half small{font-size:11px;color:#fff;opacity:.95}
+.balance-half strong{font-size:17px;color:#fff;overflow-wrap:anywhere}
+.balance-half .balance-label{display:flex;align-items:center;justify-content:space-between}
+.balance-half .eye-btn{color:#fff;background:#ffffff26}
+.page-context{display:flex;justify-content:center;align-items:center;text-align:center;margin:15px 0 0;padding:12px 14px;background:#ffffff20;border:1px solid #ffffff40;color:#fff;border-radius:13px;box-shadow:none;font-size:16px;font-weight:900;min-height:44px}.page-context span:last-child{display:none}
+
+
+/* PWA/mobile polish — additive styles, existing layout and colors retained */
+html{ -webkit-text-size-adjust:100%; }
+body{ overscroll-behavior-y:contain; }
+button,.btn,.chip,.nav button{ min-height:44px; touch-action:manipulation; }
+input,select{ min-height:46px; font-size:16px; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
+ outline:3px solid #91a8ff; outline-offset:2px;
+}
+.app{ padding-bottom:calc(88px + env(safe-area-inset-bottom)); }
+.navinner{ padding-bottom:max(8px,env(safe-area-inset-bottom)); }
+@media(max-width:420px){
+ main{padding:14px}
+ .panel{padding:13px}
+ .formgrid{grid-template-columns:minmax(0,1fr);gap:0}
+ .formactions{flex-direction:column}
+ .formactions>*{width:100%}
+ .home-tile{min-width:0}
+}
+@media(display-mode:standalone){
+ .top{padding-top:calc(18px + env(safe-area-inset-top))}
+}
+
+.member-expense-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 8px;padding:15px 16px;border-radius:15px;background:linear-gradient(120deg,#ffbd62,#f28b24);color:#57300a;border:1px solid #f2a044;box-shadow:0 5px 14px rgba(224,128,24,.14)}
+.member-expense-heading strong{font-size:14px;font-weight:900}.member-expense-heading b{font-size:clamp(13px,3.8vw,17px);direction:rtl;text-align:left;overflow-wrap:anywhere;max-width:62%}
+
+
+.settings-accordion{border:1px solid var(--line);border-radius:14px;padding:0 12px;margin:12px 0;background:#fff}
+.settings-accordion summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 2px;font-weight:800;color:var(--ink)}
+.settings-accordion summary::-webkit-details-marker{display:none}
+.settings-accordion summary:after{content:"＋";font-size:20px;color:var(--blue);font-weight:900}
+.settings-accordion[open] summary:after{content:"−"}
+.settings-accordion summary small{font-size:10px;color:var(--muted);font-weight:500;margin-right:auto}
+.settings-accordion #categoryManager{padding-top:5px}
+.cat-accordion{border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden;background:#fff}
+.cat-accordion>summary{list-style:none;padding:13px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cat-accordion>summary::-webkit-details-marker{display:none}
+.cat-accordion>summary:after{content:"＋";color:var(--blue);font-size:19px}
+.cat-accordion[open]>summary:after{content:"−"}
+.cat-accordion>summary small{font-size:10px;color:var(--muted);font-weight:500;margin-right:auto}
+.cat-accordion-body{padding:0 10px 10px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="topline"><div><div class="brand">🧮 چرتکه</div><div class="datehint" id="todayJalali">مدیریت مالی خانواده</div></div><div class="avatar">⌂</div></div>
+ <div id="pageContext" class="page-context hidden" aria-live="polite"><span id="pageContextTitle">خانه</span><span id="pageContextTrail">چرتکه</span></div>
+ <div class="balancebox"><div class="balance-half balance-blue"><div class="balance-label"><small>موجودی کل</small><button type="button" class="eye-btn" id="balanceToggle" aria-label="نمایش یا مخفی‌کردن موجودی" onclick="toggleBalance()">◉</button></div><strong id="balance">۰ تومان</strong></div><div class="balance-half balance-red"><small>مجموع هزینه‌های این ماه</small><strong id="expense">۰ تومان</strong></div></div>
+</header>
+<main>
+<section id="homePage" class="page active">
+ <div class="sectionhead tile-heading"><h2>مدیریت هزینه‌ها</h2><span class="muted">انتخاب بخش</span></div><div id="recent" class="hidden"></div>
+ <div class="tile-grid" id="homeTiles">
+  <button class="home-tile tile-expense" onclick="openExpenseHub()"><span class="tile-icon">↘</span><b>هزینه‌ها</b><small>ثبت و پیگیری هزینه</small></button>
+  <button class="home-tile tile-income" onclick="openBalancePage()"><span class="tile-icon">↗</span><b>موجودی</b><small>افزودن به موجودی کل</small></button>
+  <button class="home-tile tile-installment" onclick="openInstallmentHub()"><span class="tile-icon">▤</span><b>اقساط</b><small>مدیریت سفارش‌ها و وام‌ها</small></button>
+  <button class="home-tile tile-transport" onclick="openTransportPage()"><span class="tile-icon">🚕</span><b>حمل‌ونقل</b><small>رفت‌وآمد و خودرو</small></button>
+  <button class="home-tile tile-rent" onclick="openRentPage()"><span class="tile-icon">⌂</span><b>اجاره</b><small>هزینه مسکن</small></button>
+  <button class="home-tile tile-family" onclick="openVehiclePage()"><span class="tile-icon">🚗</span><b>هزینه‌های خودرو</b><small>بنزین، روغن، تعمیرات و موارد دیگر</small></button>
+ </div>
+ <div class="tile-grid" style="margin-top:11px;grid-template-columns:repeat(3,minmax(0,1fr))"><button class="home-tile tile-family" onclick="openPeoplePage()"><span class="tile-icon">＋</span><b>افراد</b><small>افزودن و مدیریت</small></button></div>
+
+</section>
+
+<section id="addPage" class="page">
+ 
+ <div id="expenseSummary" class="tile-grid" style="margin:12px 0 16px"></div>
+ <div class="sectionhead"><h2>ثبت هزینه</h2><span class="muted">ساده و سریع</span></div>
+ <div class="panel">
+  <form id="form">
+   <div class="field" style="margin-bottom:14px;padding:12px;background:#f3f6fc;border-radius:12px"><label for="date" style="font-weight:700">📅 تاریخ هزینه‌ها (تا وقتی تغییرش ندهی ثابت می‌ماند)</label><input id="date" type="date" required style="font-weight:700"></div>
+   <div class="chips"><span class="chip active">ثبت هزینه</span></div>
+   <div class="field"><label>عنوان هزینه / نام دقیق مورد</label><input id="title" required placeholder="مثلاً شیر، آبمیوه یا کرایه تاکسی"></div>
+   <div class="formgrid">
+    <div class="field"><label>مقدار (اجباری)</label><input id="quantity" type="number" min="0.001" step="any" required placeholder="مثلاً ۲"></div>
+    <div class="field"><label>واحد (اجباری)</label><input id="unit" required placeholder="کیلوگرم، لیتر، عدد..."></div>
+   </div>
+   <div class="field"><label>مبلغ هزینه (تومان)</label><input id="amount" type="number" min="1" step="1" required placeholder="مثلاً ۲۵۰۰۰۰"></div>
+   <div class="field"><label>دسته‌بندی اصلی</label><select id="category" required></select></div>
+   <div class="field"><label>زیرگروه</label><select id="subcategory"></select></div>
+   <div class="field"><label>صاحب این هزینه چه کسی است؟</label><select id="familyMember"><option value="">بدون انتساب به فرد</option></select></div>
+   <div class="field"><label for="description">توضیحات (اختیاری)</label><textarea id="description" rows="2" placeholder="توضیح تکمیلی درباره این هزینه" style="width:100%;padding:12px;border:1px solid #dfe5ef;border-radius:12px;font:inherit"></textarea></div>
+   <div class="formactions"><button class="btn" type="submit">ثبت هزینه</button><button class="btn light" type="reset">پاک کردن</button></div><button class="btn light" type="button" style="width:100%;margin-top:8px" onclick="showPage('transactionsPage',null,null,'سوابق همه هزینه‌ها')">مشاهده سوابق همه هزینه‌ها</button><button class="btn light" type="button" style="width:100%;margin-top:8px" onclick="goHome()">پایان ثبت هزینه و بازگشت به صفحه اصلی</button>
+  </form>
+ </div>
+ <div class="panel" style="margin-top:12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+   <div><b>ثبت فاکتور با عکس</b><div class="muted" style="margin-top:6px">این قابلیت فعلاً غیرفعال است.</div></div>
+   <button type="button" class="btn light" style="white-space:nowrap" onclick="alert('این قابلیت به‌زودی فعال می‌شود.')">🔒 به‌زودی</button>
+  </div>
+ </div>
+</section>
+
+<section id="installmentPage" class="page">
+ <div class="sectionhead"><h2>مدیریت اقساط</h2><span class="muted">سفارش‌ها و تعهدات</span></div>
+ <div class="panel installment-intro"><b>اقساط خانواده</b><p>اقساط بانکی و سازمانی از خریدهای اقساطی فروشگاه‌ها جدا نگهداری می‌شوند؛ این بخش محل ثبت درآمد یا هزینه عادی نیست.</p></div>
+ <div class="installment-tabs"><button class="installment-tab active" id="storeTab" onclick="setInstallmentMode('store')">🛍 فروشگاه‌های اقساطی</button><button class="installment-tab" id="bankTab" onclick="setInstallmentMode('bank')">🏦 بانکی و سازمانی</button></div>
+ <div class="panel"><div class="sectionhead"><h3 id="installmentTitle">فروشگاه‌های اقساطی</h3><button class="btn light" type="button" onclick="addInstallmentSource()">＋ افزودن</button></div><div id="installmentSources"></div></div>
+ <div class="panel" id="installmentDetail" style="display:none;margin-top:12px"></div>
+ <button class="back" style="margin-top:12px" onclick="showPage('homePage')">← بازگشت به خانه</button>
+</section>
+<section id="specialPage" class="page"><div class="panel" id="specialContent"></div></section>
+
+<section id="reportPage" class="page">
+ <div class="sectionhead"><h2>گزارش هزینه‌ها</h2><span class="muted">نمای کلی</span></div>
+ <div class="panel"><div class="chips"><button class="chip active" id="reportCats" onclick="setReportMode('categories')">دسته‌بندی‌ها</button><button class="chip" id="reportMembers" onclick="setReportMode('members')">افراد</button></div><div class="muted" style="margin-bottom:8px" id="reportHint">برای دیدن جزئیات، یک دسته را انتخاب کن.</div><div id="reportContent"></div></div>
+</section>
+
+<section id="transactionsPage" class="page">
+ <div class="sectionhead"><h2>همه تراکنش‌ها</h2><span class="muted" id="txCount"></span></div>
+ <div class="panel" id="allTransactions"></div>
+</section>
+
+<section id="peoplePage" class="page">
+ <div class="panel" style="margin-bottom:12px"><div class="sectionhead"><h2>مدیر این گوشی</h2><span class="muted">فقط برای نمایش «هزینه‌های من»</span></div><div class="field"><label>نام مدیر این دستگاه</label><select id="localManagerSelect"><option value="">ابتدا یک فرد معرفی کن</option></select></div><div class="muted">این انتخاب فقط روی همین گوشی ذخیره می‌شود؛ گوشی دیگر می‌تواند مدیر متفاوتی داشته باشد.</div></div>
+ <div class="panel"><div class="sectionhead"><h2>افراد</h2><span class="muted">مدیریت با نام دلخواه</span></div><div id="peopleManager"></div><button class="btn secondary" style="width:100%;margin-top:8px" onclick="addFamilyMember();refreshPeopleManager()">＋ افزودن شخص</button></div>
+</section>
+<section id="settingsPage" class="page">
+ <div class="sectionhead"><h2>پشتیبان‌گیری و تنظیمات</h2></div>
+ <div class="panel" style="margin-bottom:12px">
+  <b>نصب چرتکه روی گوشی</b>
+  <p style="font-size:12px;line-height:2;color:var(--muted)">چرتکه را به صفحه اصلی اضافه کن تا مانند یک برنامه مستقل باز شود. برای نصب اولیه اتصال اینترنت لازم است.</p>
+  <button class="btn" id="installAppBtn" type="button" style="width:100%">＋ نصب چرتکه</button>
+  <div id="installHelp" class="muted" style="line-height:2;margin-top:8px" aria-live="polite">اگر دکمه نصب فعال نبود، از منوی مرورگر گزینه «افزودن به صفحه اصلی» یا «Install app» را انتخاب کن.</div>
+ </div>
+ <div class="panel" id="securityPanel" style="margin-bottom:12px">
+  <b>قفل امنیتی چرتکه</b>
+  <p class="muted" style="line-height:2;margin:8px 0">برای ورود به برنامه رمز ۴ تا ۶ رقمی تعیین کن. در صورت فعال‌بودن قفل، با رفتن برنامه به پس‌زمینه یا پس از مدت عدم فعالیت، رمز درخواست می‌شود.</p>
+  <div class="field"><label for="lockTimeout">زمان قفل خودکار پس از عدم فعالیت</label><select id="lockTimeout"><option value="1">۱ دقیقه</option><option value="3" selected>۳ دقیقه</option><option value="5">۵ دقیقه</option><option value="10">۱۰ دقیقه</option></select></div>
+  <div class="formactions"><button class="btn" type="button" id="enablePinBtn">فعال‌کردن قفل</button><button class="btn secondary" type="button" id="changePinBtn" disabled>تغییر رمز</button></div>
+  <div class="formactions" style="margin-top:9px"><button class="btn light" type="button" id="lockNowBtn" disabled>قفل همین حالا</button><button class="btn light" type="button" id="disablePinBtn" disabled>غیرفعال‌کردن قفل</button></div>
+  <div class="note" style="margin-top:10px">توجه: این قابلیت ورود به برنامه را با PIN محدود می‌کند، اما داده‌های ذخیره‌شده در حافظه مرورگر را رمزگذاری نمی‌کند. برای حفاظت بیشتر، گوشی را نیز با قفل صفحه ایمن نگه دار.</div>
+  <div class="muted" id="securityStatus" aria-live="polite" style="margin-top:8px">قفل غیرفعال است.</div>
+ </div>
+ <div class="panel">
+  <p style="font-size:12px;line-height:2;color:var(--muted)">برای حفظ اطلاعات، قبل از نصب نسخه‌های بعدی یک فایل پشتیبان بگیر. این اطلاعات ابتدا روی دستگاه ذخیره می‌شوند و پس از ورود به حساب، با فضای ابری همگام‌سازی خواهند شد.</p>
+  <button class="btn" style="width:100%" onclick="backup()">دریافت نسخه پشتیبان</button>
+  <button class="btn secondary" style="width:100%;margin-top:9px" onclick="document.getElementById('restore').click()">بازیابی نسخه پشتیبان</button>
+  <div class="sectionhead"><h2>اتصال دستگاه‌ها</h2></div><div class="note">اتصال با کد خانوادگی هنوز نیازمند پیاده‌سازی سرویس امن همگام‌سازی است؛ ورود ایمیل و رمز عبور در این نسخه از مسیر کاربری حذف شده است.</div>
+  <div class="sectionhead"><h2>تجمیع دوره‌ای با QR</h2></div>
+  <div class="note">اطلاعات فقط هنگام درخواست شما منتقل می‌شود و همگام‌سازی دائمی وجود ندارد. QR گزارش مالی را در خود دارد؛ آن را فقط به مدیر مورداعتماد نشان بدهید. برای گزارش‌های حجیم از فایل پشتیبان/انتقال فایل استفاده کنید.</div>
+  <div class="formgrid"><div class="field"><label>از تاریخ</label><input id="mergeFrom" type="date"></div><div class="field"><label>تا تاریخ</label><input id="mergeTo" type="date"></div></div>
+  <button class="btn" type="button" style="width:100%" onclick="createMergeQR()">ساخت QR گزارش این بازه</button>
+  <div id="mergeQrBox" class="panel" style="display:none;margin-top:10px;text-align:center;overflow-wrap:anywhere"></div>
+  <button class="btn secondary" type="button" style="width:100%;margin-top:9px" onclick="startMergeScan()">اسکن QR گوشی دیگر</button>
+  <div id="mergeScanBox" class="panel" style="display:none;margin-top:10px"><video id="mergeVideo" playsinline style="width:100%;border-radius:12px"></video><div class="muted">QR گزارش را مقابل دوربین قرار بده.</div><button class="btn light" type="button" onclick="stopMergeScan()">توقف دوربین</button></div>
+  <div id="mergeStatus" class="cloudstatus" aria-live="polite"></div>
+  <div class="sectionhead"><h2>افراد</h2></div><div id="familyManager"></div><button class="btn secondary" style="width:100%;margin-top:8px" onclick="addFamilyMember()">＋ افزودن شخص</button><details class="settings-accordion" id="expenseCategoryAccordion"><summary><span>مدیریت هزینه‌ها و دسته‌بندی‌ها</span><small>افزودن، ویرایش و بایگانی</small></summary>
+   <div id="categoryManager"></div>
+   <button class="btn" style="width:100%;margin-top:10px" onclick="addCategory()">＋ افزودن دسته اصلی</button>
+  </details>
+  <input id="restore" type="file" accept=".json" class="hidden">
+  <div class="note">اطلاعات هنوز بین گوشی‌های مختلف همگام‌سازی نمی‌شود. پاک‌کردن داده‌های مرورگر ممکن است اطلاعات را از دسترس خارج کند.</div>
+ </div>
+</section>
+<footer>چرتکه · نسخه ۱.۹.۱۴ · آکاردئون دسته‌بندی‌ها</footer>
+</main>
+</div>
+<nav class="nav"><div class="navinner" style="grid-template-columns:repeat(3,1fr)">
+ <button id="navHome" class="active" data-page="homePage" type="button"><span>⌂</span>خانه</button>
+ <button data-page="reportPage"><span>▥</span>گزارش</button>
+ <button data-page="settingsPage"><span>⚙</span>تنظیمات</button>
+</div></nav>
+<script>
+const KEY="chortkeh_database", VERSION=12;
+const DEFAULTS={
+ "خوراک":["لبنیات","حبوبات","نان و غلات","گوشت و مرغ","میوه و سبزیجات","تنقلات","نوشیدنی‌ها","روغن"],
+ "اجاره":[],"حمل‌ونقل":["تاکسی","مترو","اتوبوس","هواپیما"],"خودرو":["بنزین","روغن موتور","فیلتر روغن","فیلتر هوا","تعمیرات","قطعات","بیمه","معاینه فنی"],"اقساط":[],
+ "قبوض":["آب","برق","گاز","تلفن و اینترنت"],"درمان":["دارو","ویزیت"],
+ "پوشاک":["لباس","کفش","جوراب","زیرپوش","شورت"],"آموزش":["شهریه","لوازم‌التحریر"],"تفریح":["رستوران","سفر"],"سایر":[]
+};
+const LEGACY=["حقوق","خوراک","حمل و نقل","قبوض","درمان","آموزش","خرید","تفریح","سایر"];
+function emptyDB(){return {version:VERSION,transactions:[],familyMembers:[],installmentSources:{store:[],bank:[]},installmentOrders:[],bankPayments:[],balanceAdds:[],rentTypes:[],vehicleItems:["بنزین","روغن موتور","فیلتر روغن","فیلتر هوا","تعمیرات","قطعات","بیمه","معاینه فنی"],cloudCategoryMap:{},categories:[...LEGACY],categoryConfig:{...Object.fromEntries(Object.entries(DEFAULTS).map(([k,v])=>[k,[...v]])),...Object.fromEntries(LEGACY.map(k=>[k,[]]))},archivedCategories:[],archivedSubcategories:{},storeItemCategories:["مواد خوراکی","نوشیدنی","شوینده","بهداشتی و آرایشی","پوشاک","لوازم خانه","لوازم مصرفی خودرو","سایر"]};}
+function validTx(t){return t&&["income","expense"].includes(t.type)&&Number.isSafeInteger(t.amount)&&t.amount>0&&typeof t.title==="string"&&typeof t.category==="string"&&typeof t.date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(t.date);}
+function migrate(data){
+ if(!data||!Array.isArray(data.transactions)||!data.transactions.every(validTx))throw Error("ساختار اطلاعات معتبر نیست");
+ if(!Number.isInteger(data.version)||data.version>VERSION||data.version<1)throw Error("نسخه اطلاعات پشتیبانی نمی‌شود");
+ const out={...data,version:VERSION,transactions:data.transactions.map(t=>({...t,id:typeof t.id==="string"&&t.id?t.id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()))}))};
+ if(!Array.isArray(out.familyMembers))out.familyMembers=[];
+ if(!out.installmentSources||typeof out.installmentSources!=="object")out.installmentSources={store:[],bank:[]};
+ if(!Array.isArray(out.installmentSources.store))out.installmentSources.store=[];
+ if(!Array.isArray(out.installmentSources.bank))out.installmentSources.bank=[];
+ if(!Array.isArray(out.installmentOrders))out.installmentOrders=[];if(!Array.isArray(out.bankPayments))out.bankPayments=[];if(!Array.isArray(out.balanceAdds))out.balanceAdds=[];if(!Array.isArray(out.rentTypes))out.rentTypes=[];if(!Array.isArray(out.vehicleItems))out.vehicleItems=["بنزین","روغن موتور","فیلتر روغن","فیلتر هوا","تعمیرات","قطعات","بیمه","معاینه فنی"];
+ if(!out.cloudCategoryMap||typeof out.cloudCategoryMap!=="object")out.cloudCategoryMap={};
+ const memberIdMap={};
+ out.familyMembers=out.familyMembers.filter(m=>m&&typeof m.id==="string"&&typeof m.name==="string"&&m.name.trim()).map(m=>{
+  let id=m.id;
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)){
+   const nextId=crypto.randomUUID?crypto.randomUUID():id;memberIdMap[id]=nextId;id=nextId;
+  }
+  return {...m,id,name:m.name.trim(),archivedAt:m.archivedAt||null,createdAt:m.createdAt||new Date().toISOString(),updatedAt:m.updatedAt||m.archivedAt||new Date(0).toISOString()};
+ });
+ out.transactions=out.transactions.map(t=>({...t,familyMemberId:memberIdMap[t.familyMemberId]|| (typeof t.familyMemberId==="string"?t.familyMemberId:null)}));
+ if(!Array.isArray(out.categories))out.categories=[];
+ if(!Array.isArray(out.storeItemCategories))out.storeItemCategories=["مواد خوراکی","نوشیدنی","شوینده","بهداشتی و آرایشی","پوشاک","لوازم خانه","لوازم مصرفی خودرو","سایر"];
+ if(!out.categoryConfig||typeof out.categoryConfig!=="object")out.categoryConfig={};
+ if(!Array.isArray(out.archivedCategories))out.archivedCategories=[];
+ if(!out.archivedSubcategories||typeof out.archivedSubcategories!=="object")out.archivedSubcategories={};
+ Object.entries(DEFAULTS).forEach(([c,subs])=>{if(!Array.isArray(out.categoryConfig[c]))out.categoryConfig[c]=[...subs];});
+ out.categories.forEach(c=>{if(typeof c==="string"&&!Array.isArray(out.categoryConfig[c]))out.categoryConfig[c]=[];});
+ // Consolidate legacy spellings of transport into one canonical category without dropping transactions.
+ const transportAliases=new Set(["حمل‌ونقل","حمل و نقل","حمل-ونقل","حملونقل"]);
+ out.transactions.forEach(t=>{if(transportAliases.has(String(t.category||"").replace(/\s+/g," ").trim()))t.category="حمل‌ونقل";});
+ const transportSubs=["تاکسی","مترو","اتوبوس","هواپیما"];
+ const oldTransportSubs=[...(out.categoryConfig["حمل‌ونقل"]||[]),...(out.categoryConfig["حمل و نقل"]||[])];
+ out.categoryConfig["حمل‌ونقل"]=[...new Set([...transportSubs,...oldTransportSubs])];
+ delete out.categoryConfig["حمل و نقل"];
+ out.categories=[...new Set((out.categories||[]).map(c=>transportAliases.has(String(c).replace(/\s+/g," ").trim())?"حمل‌ونقل":c))];
+ out.categories=out.categories.filter((c,i,a)=>a.indexOf(c)===i);
+ out.archivedCategories=(out.archivedCategories||[]).filter(c=>!transportAliases.has(String(c).replace(/\s+/g," ").trim()));
+ delete out.archivedSubcategories["حمل و نقل"];
+ out.transactions.forEach(t=>{if(!Array.isArray(out.categoryConfig[t.category]))out.categoryConfig[t.category]=[];if(t.subcategory&&!out.categoryConfig[t.category].includes(t.subcategory))out.categoryConfig[t.category].push(t.subcategory);});
+ return out;
+}
+let db,storageReady=true;
+try{
+ const raw=localStorage.getItem(KEY);
+ if(raw===null){db=emptyDB();}
+ else {
+  const parsed=JSON.parse(raw);
+  // Keep an untouched copy before any older database is migrated or rewritten.
+  if(parsed && Number.isInteger(parsed.version) && parsed.version<VERSION){
+   const backupKey=KEY+"_pre_migration_v"+parsed.version+"_"+Date.now();
+   localStorage.setItem(backupKey,raw);
+  }
+  db=migrate(parsed);
+ }
+}catch(e){storageReady=false;db=emptyDB();}
+function save(){if(!storageReady)throw Error("ذخیره‌سازی برای محافظت از اطلاعات غیرفعال است");db.version=VERSION;localStorage.setItem(KEY,JSON.stringify(db));}
+function money(n){return new Intl.NumberFormat("fa-IR").format(n)+" تومان";}
+function displayDate(s){if(!s)return "";const d=new Date(s+"T12:00:00");return new Intl.DateTimeFormat("fa-IR-u-ca-persian",{year:"numeric",month:"short",day:"numeric"}).format(d);}
+function allCats(includeArchived=false){const names=[...new Set([...Object.keys(db.categoryConfig||{}),...db.transactions.map(t=>t.category)])];return names.filter(c=>includeArchived||!(db.archivedCategories||[]).includes(c));}
+function subCats(cat,includeArchived=false){const names=[...new Set([...(db.categoryConfig?.[cat]||DEFAULTS[cat]||[]),...db.transactions.filter(t=>t.category===cat&&t.subcategory).map(t=>t.subcategory)])];const archived=db.archivedSubcategories?.[cat]||[];return names.filter(x=>includeArchived||!archived.includes(x));}
+function memberName(id){return db.familyMembers.find(m=>m.id===id)?.name||"";}
+function txNode(t){const div=document.createElement("div");div.className="tx";const a=document.createElement("div");const n=document.createElement("div");n.className="txname";n.textContent=t.title;const m=document.createElement("div");m.className="txmeta";m.textContent=[t.category,t.subcategory,memberName(t.familyMemberId)||t.person,displayDate(t.date),t.description].filter(Boolean).join(" · ");a.append(n,m);const v=document.createElement("div");v.className="txamount "+(t.type==="income"?"green":"red");v.textContent=(t.type==="income"?"+":"−")+money(t.amount);div.append(a,v);return div;}
+function todayPersian(){return new Intl.DateTimeFormat("fa-IR-u-ca-persian-nu-arab",{weekday:"long",year:"numeric",month:"long",day:"numeric"}).format(new Date());}
+function updateHeaderDate(){const el=document.getElementById("todayJalali");if(el)el.textContent=todayPersian();}
+function toggleBalance(){const hidden=localStorage.getItem("chortkeh_balance_hidden")==="1";localStorage.setItem("chortkeh_balance_hidden",hidden?"0":"1");applyBalanceVisibility();}
+function applyBalanceVisibility(){const hidden=localStorage.getItem("chortkeh_balance_hidden")==="1";const el=document.getElementById("balance"),btn=document.getElementById("balanceToggle");if(el)el.textContent=hidden?"••••••••":money((db.balanceAdds||[]).reduce((a,t)=>a+t.amount,0)-db.transactions.filter(t=>t.type==="expense").reduce((a,t)=>a+t.amount,0));if(btn)btn.textContent=hidden?"◎":"◉";}
+const LOCAL_MANAGER_KEY="chortkeh_local_manager_id";
+function localManagerId(){const id=localStorage.getItem(LOCAL_MANAGER_KEY)||"";return db.familyMembers.some(m=>m.id===id&&!m.archivedAt)?id:"";}
+function setLocalManager(id){if(id)localStorage.setItem(LOCAL_MANAGER_KEY,id);else localStorage.removeItem(LOCAL_MANAGER_KEY);renderExpenseSummary();refreshPeopleManager();}
+function refreshLocalManagerSelect(){const sel=document.getElementById("localManagerSelect");if(!sel)return;const chosen=localManagerId();sel.innerHTML='<option value="">انتخاب مدیر این گوشی</option>';db.familyMembers.filter(m=>!m.archivedAt).forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.name;sel.append(o);});sel.value=chosen;sel.onchange=()=>setLocalManager(sel.value);}
+function renderExpenseSummary(){const root=document.getElementById("expenseSummary");if(!root)return;root.innerHTML="";const expenses=db.transactions.filter(t=>t.type==="expense");const mineId=localManagerId();const specs=[{id:"__mine__",name:"هزینه‌های من"+(mineId?" · "+memberName(mineId):""),amount:mineId?expenses.filter(t=>t.familyMemberId===mineId).reduce((a,t)=>a+t.amount,0):0,cls:"tile-manager",hint:mineId?"هزینه‌های منتسب به مدیر این گوشی":"مدیر این گوشی را در بخش افراد تعیین کن"},...db.familyMembers.filter(m=>!m.archivedAt&&m.id!==mineId).map(m=>({id:m.id,name:m.name,amount:expenses.filter(t=>t.familyMemberId===m.id).reduce((a,t)=>a+t.amount,0),cls:"family-person",hint:"مجموع هزینه‌های این فرد"}))];specs.forEach(x=>{const b=document.createElement("button");b.type="button";b.className="home-tile "+x.cls;b.innerHTML='<span class="tile-icon">'+(x.id==="__mine__"?'♙':'♧')+'</span>';const n=document.createElement("b");n.textContent=x.name;const amount=document.createElement("strong");amount.className='expense-tile-amount';amount.textContent=money(x.amount);const hint=document.createElement("small");hint.textContent=x.hint;b.append(n,amount,hint);b.onclick=()=>{if(x.id==="__mine__")openExpenseList(mineId,"هزینه‌های من");else openExpenseList(x.id,"هزینه‌های "+x.name);};root.append(b);});}
+function renderFamilyTiles(){renderExpenseSummary();}
+
+function openExpenseHub(){showPage("addPage","expense",null,"هزینه‌ها");renderExpenseSummary();}
+
+function openExpenseList(memberId,title){showPage("specialPage",null,null,title);const root=document.getElementById("specialContent");root.innerHTML="";const list=db.transactions.filter(t=>t.type==="expense"&&!!memberId&&t.familyMemberId===memberId);const total=list.reduce((a,t)=>a+t.amount,0);const heading=document.createElement("div");heading.className="member-expense-heading";const label=document.createElement("strong");label.textContent=title;const amount=document.createElement("b");amount.textContent=money(total);heading.append(label,amount);root.append(heading);const back=document.createElement("button");back.className="back";back.textContent="← بازگشت به هزینه‌ها";back.onclick=()=>openExpenseHub();root.append(back);if(!list.length){const e=document.createElement("div");e.className="empty";e.textContent=memberId?"هزینه‌ای برای نمایش وجود ندارد.":"ابتدا مدیر این گوشی را در بخش افراد تعیین کن.";root.append(e);}list.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(t=>root.append(txNode(t)));}
+
+function openMemberExpense(id){showPage("addPage","expense",null,"هزینه‌های "+(memberName(id)||"فرد"));populateFamilySelect(id);}
+
+function refreshPeopleManager(){const root=document.getElementById("peopleManager");if(!root)return;root.innerHTML="";if(!db.familyMembers.length){root.innerHTML='<div class="empty">هنوز فردی تعریف نشده است.</div>';return;}db.familyMembers.forEach(m=>{const row=document.createElement("div");row.className="reportrow";const info=document.createElement("b");info.textContent=m.name+(m.archivedAt?" · بایگانی‌شده":"");const actions=document.createElement("div");actions.append(managerButton("تغییر نام",()=>{renameFamilyMember(m.id);refreshPeopleManager();}));actions.append(managerButton(m.archivedAt?"فعال‌سازی":"بایگانی",()=>{archiveFamilyMember(m.id,!m.archivedAt);refreshPeopleManager();}));row.append(info,actions);root.append(row);});}
+function openPeoplePage(){refreshPeopleManager();refreshLocalManagerSelect();showPage("peoplePage",null,null,"افراد");}
+function render(){
+ const inc=(db.balanceAdds||[]).reduce((s,t)=>s+t.amount,0), exp=db.transactions.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+ const now=new Date(),monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);const monthExp=db.transactions.filter(t=>t.type==="expense"&&t.date>=monthStart).reduce((a,t)=>a+t.amount,0);document.getElementById("expense").textContent=money(monthExp);
+ applyBalanceVisibility();updateHeaderDate();renderFamilyTiles();
+ const recent=document.getElementById("recent"),all=document.getElementById("allTransactions");recent.innerHTML="";all.innerHTML="";
+ [...db.transactions].reverse().slice(0,5).forEach(t=>recent.append(txNode(t)));
+ [...db.transactions].reverse().forEach(t=>all.append(txNode(t)));
+ if(!db.transactions.length){recent.innerHTML='<div class="empty">هنوز تراکنشی ثبت نشده است.</div>';all.innerHTML='<div class="empty">هنوز تراکنشی ثبت نشده است.</div>';}
+ document.getElementById("txCount").textContent=new Intl.NumberFormat("fa-IR").format(db.transactions.length)+" مورد";
+ renderReports();renderExpenseSummary();
+}
+let reportPath=[],reportMode="categories";
+function setReportMode(mode){reportMode=mode;reportPath=[];document.getElementById("reportCats").classList.toggle("active",mode==="categories");document.getElementById("reportMembers").classList.toggle("active",mode==="members");document.getElementById("reportHint").textContent=mode==="members"?"هزینه‌های هر فرد را انتخاب کن.":"برای دیدن جزئیات، یک دسته را انتخاب کن.";renderReports();}
+function renderReports(){
+ const el=document.getElementById("reportContent");el.innerHTML="";
+ const expenses=db.transactions.filter(t=>t.type==="expense");
+ if(reportMode==="members"){
+  if(!reportPath.length){
+   const groups=[...db.familyMembers.map(m=>({id:m.id,name:m.name})),{id:"__none__",name:"بدون انتساب"}];
+   groups.forEach(g=>{const list=expenses.filter(t=>g.id==="__none__"?!db.familyMembers.some(m=>m.id===t.familyMemberId):t.familyMemberId===g.id);const row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(g.name)}</b><small>${list.length} تراکنش</small></div><div><b>${money(list.reduce((a,t)=>a+t.amount,0))}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[g.id];renderReports()};el.append(row);});
+  }else if(reportPath.length===1){
+   const id=reportPath[0],back=document.createElement("button");back.className="back";back.textContent="→ بازگشت به اعضا";back.onclick=()=>{reportPath=[];renderReports()};el.append(back);
+   const list=expenses.filter(t=>id==="__none__"?!db.familyMembers.some(m=>m.id===t.familyMemberId):t.familyMemberId===id);
+   [...new Set(list.map(t=>t.category))].forEach(c=>{const a=list.filter(t=>t.category===c),row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(c)}</b><small>${a.length} تراکنش</small></div><div><b>${money(a.reduce((n,t)=>n+t.amount,0))}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[id,c];renderReports()};el.append(row);});
+   if(!list.length)el.insertAdjacentHTML("beforeend",'<div class="empty">هزینه‌ای ثبت نشده است.</div>');
+  }else{
+   const [id,c]=reportPath,back=document.createElement("button");back.className="back";back.textContent="→ بازگشت";back.onclick=()=>{reportPath=[id];renderReports()};el.append(back);
+   expenses.filter(t=>(id==="__none__"?!db.familyMembers.some(m=>m.id===t.familyMemberId):t.familyMemberId===id)&&t.category===c).forEach(t=>el.append(txNode(t)));
+  }return;
+ }
+ if(!reportPath.length){
+  [...new Set([...allCats(true),...expenses.map(t=>t.category)])].forEach(c=>{const a=expenses.filter(t=>t.category===c),row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(c)}</b><small>${a.length} تراکنش</small></div><div><b>${money(a.reduce((n,t)=>n+t.amount,0))}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[c];renderReports()};el.append(row);});
+ }else if(reportPath.length===1){
+  const c=reportPath[0],back=document.createElement("button");back.className="back";back.textContent="→ بازگشت به دسته‌ها";back.onclick=()=>{reportPath=[];renderReports()};el.append(back);
+  const subs=[...new Set([...subCats(c,true),...expenses.filter(t=>t.category===c&&!t.subcategory).map(()=>"بدون زیرگروه")])];subs.forEach(sub=>{const a=expenses.filter(t=>t.category===c&&(sub==="بدون زیرگروه"?!t.subcategory:t.subcategory===sub)),row=document.createElement("div");row.className="reportrow";row.innerHTML=`<div><b>${escapeHtml(sub)}</b><small>${a.length} تراکنش</small></div><div><b>${money(a.reduce((n,t)=>n+t.amount,0))}</b><span class="arrow"> ‹</span></div>`;row.onclick=()=>{reportPath=[c,sub];renderReports()};el.append(row);});
+ }else{const [c,sub]=reportPath,back=document.createElement("button");back.className="back";back.textContent="→ بازگشت";back.onclick=()=>{reportPath=[c];renderReports()};el.append(back);expenses.filter(t=>t.category===c&&(sub==="بدون زیرگروه"?!t.subcategory:t.subcategory===sub)).forEach(t=>el.append(txNode(t)));}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function managerButton(label,fn,cls="btn light"){const b=document.createElement("button");b.className=cls;b.textContent=label;b.style.cssText="padding:8px 10px;margin:3px;font-size:11px";b.onclick=fn;return b;}
+function activeSubCats(cat){return subCats(cat,true).filter(x=>!(cat==="حمل‌ونقل"&&x==="تعمیر و نگهداری"));}
+function refreshCategoryManager(){
+ const root=document.getElementById("categoryManager");if(!root)return;root.innerHTML="";
+ allCats(true).forEach(cat=>{
+  const box=document.createElement("details");box.className="cat-accordion";
+  const summary=document.createElement("summary"),label=document.createElement("span");label.textContent=cat+(db.archivedCategories.includes(cat)?" (بایگانی‌شده)":"");
+  const count=document.createElement("small");count.textContent=activeSubCats(cat).length+" زیرگروه";summary.append(label,count);box.append(summary);
+  const body=document.createElement("div");body.className="cat-accordion-body";
+  const actions=document.createElement("div");actions.style.cssText="display:flex;flex-wrap:wrap;gap:4px;padding:8px 0";
+  actions.append(managerButton("تغییر نام",()=>renameCategory(cat)));
+  if(db.archivedCategories.includes(cat))actions.append(managerButton("فعال‌سازی",()=>toggleArchiveCategory(cat,false)));else actions.append(managerButton("بایگانی",()=>toggleArchiveCategory(cat,true)));
+  body.append(actions);
+  activeSubCats(cat).forEach(sub=>{const row=document.createElement("div");row.style.cssText="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:7px 0;gap:5px";const name=document.createElement("span");name.textContent=sub+((db.archivedSubcategories[cat]||[]).includes(sub)?" (بایگانی‌شده)":"");row.append(name,managerButton("ویرایش",()=>renameSubcategory(cat,sub)));if((db.archivedSubcategories[cat]||[]).includes(sub))row.append(managerButton("فعال‌سازی",()=>toggleArchiveSub(cat,sub,false)));else row.append(managerButton("بایگانی",()=>toggleArchiveSub(cat,sub,true)));body.append(row);});
+  body.append(managerButton("＋ افزودن زیرگروه",()=>addSubcategory(cat),"btn secondary"));box.append(body);root.append(box);
+ });
+}
+function populateFamilySelect(selected=""){const sel=document.getElementById("familyMember");if(!sel)return;sel.innerHTML="";const n=document.createElement("option");n.value="";n.textContent="بدون انتساب به فرد";sel.append(n);db.familyMembers.filter(m=>!m.archivedAt).forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.name;sel.append(o)});sel.value=selected||"";}
+function refreshFamilyManager(){const root=document.getElementById("familyManager");if(!root)return;root.innerHTML="";if(!db.familyMembers.length){root.innerHTML='<div class="empty">هنوز عضوی تعریف نشده است.</div>';return;}db.familyMembers.forEach(m=>{const row=document.createElement("div");row.className="reportrow";const info=document.createElement("div");info.innerHTML=`<b>${escapeHtml(m.name)}</b><small>${m.archivedAt?"بایگانی‌شده":"فعال"}</small>`;const actions=document.createElement("div");actions.append(managerButton("تغییر نام",()=>renameFamilyMember(m.id)));actions.append(managerButton(m.archivedAt?"فعال‌سازی":"بایگانی",()=>archiveFamilyMember(m.id,!m.archivedAt)));row.append(info,actions);root.append(row);});}
+function addFamilyMember(){const name=(prompt("نام فرد:")||"").trim();if(!name)return;if(db.familyMembers.some(m=>m.name===name)){alert("این نام قبلاً ثبت شده است.");return;}const now=new Date().toISOString();const member={id:crypto.randomUUID(),name,archivedAt:null,createdAt:now,updatedAt:now};db.familyMembers.push(member);save();refreshFamilyManager();refreshPeopleManager();refreshLocalManagerSelect();populateFamilySelect();renderFamilyTiles();syncOneFamilyMember(member);}
+function renameFamilyMember(id){const m=db.familyMembers.find(x=>x.id===id);if(!m)return;const name=(prompt("نام جدید عضو:",m.name)||"").trim();if(!name||name===m.name)return;if(db.familyMembers.some(x=>x.id!==id&&x.name===name)){alert("این نام قبلاً ثبت شده است.");return;}m.name=name;m.updatedAt=new Date().toISOString();save();refreshFamilyManager();populateFamilySelect();syncOneFamilyMember(m);}
+function archiveFamilyMember(id,archive){const m=db.familyMembers.find(x=>x.id===id);if(!m)return;m.archivedAt=archive?new Date().toISOString():null;m.updatedAt=new Date().toISOString();save();if(archive&&localManagerId()===id)setLocalManager("");refreshFamilyManager();refreshLocalManagerSelect();populateFamilySelect();renderReports();renderExpenseSummary();syncOneFamilyMember(m);}
+
+// Cloud sync in v1.5 is intentionally limited to family members. Transactions remain local.
+// Fill these two public client values from Supabase Project Settings > API.
+const SUPABASE_URL="https://qspcrnqfvxmqodfezlcq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_nh4f1UngP8Wq6k6SwNn9GQ_tTsM3jZu";
+let cloudClient=null,cloudUser=null,cloudBusy=false;
+function setCloudStatus(message){const el=document.getElementById("cloudStatus");if(el)el.textContent=message;}
+function cloudConfigured(){return SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("YOUR_")&&SUPABASE_ANON_KEY.length>20&&!SUPABASE_ANON_KEY.includes("YOUR_");}
+function updateCloudUI(){
+ const login=document.getElementById("cloudLogin"),signup=document.getElementById("cloudSignup"),logout=document.getElementById("cloudLogout");
+ if(!login)return;login.classList.toggle("hidden",!!cloudUser);signup.classList.toggle("hidden",!!cloudUser);logout.classList.toggle("hidden",!cloudUser);
+ if(cloudUser)setCloudStatus(`وارد شده‌اید: ${cloudUser.email||"حساب کاربری"}. همگام‌سازی ابری فعال است.`);
+ else if(!cloudConfigured())setCloudStatus("برای فعال‌شدن همگام‌سازی، آدرس Project URL و کلید anon/public را در تنظیمات اتصال داخل فایل وارد می‌کنیم. فعلاً اطلاعات فقط روی این دستگاه ذخیره می‌شود.");
+ else setCloudStatus("برای همگام‌سازی افراد، وارد حساب شوید.");
+}
+async function initCloud(){
+ if(!cloudConfigured()){updateCloudUI();return;}
+ if(!window.supabase?.createClient){setCloudStatus("کتابخانه اتصال ابری بارگذاری نشد؛ اتصال اینترنت یا دسترسی به CDN را بررسی کنید. اطلاعات محلی محفوظ است.");return;}
+ try{
+  cloudClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const {data,error}=await cloudClient.auth.getSession();if(error)throw error;
+  cloudUser=data.session?.user||null;updateCloudUI();
+  cloudClient.auth.onAuthStateChange((_event,session)=>{cloudUser=session?.user||null;updateCloudUI();if(cloudUser)setTimeout(()=>syncAllCloudData(false),0);});
+  if(cloudUser)await syncAllCloudData(false);
+ }catch(e){setCloudStatus("اتصال ابری برقرار نشد: "+(e.message||"خطای نامشخص")+". داده‌های محلی تغییر نکرده‌اند.");}
+}
+async function cloudSignIn(signUp=false){
+ if(!cloudClient){alert("اتصال ابری هنوز پیکربندی نشده است.");return;}
+ const email=document.getElementById("cloudEmail").value.trim(),password=document.getElementById("cloudPassword").value;
+ if(!email||!password){alert("ایمیل و رمز عبور را وارد کنید.");return;}
+ try{
+  setCloudStatus(signUp?"در حال ساخت حساب…":"در حال ورود…");
+  const result=signUp?await cloudClient.auth.signUp({email,password}):await cloudClient.auth.signInWithPassword({email,password});
+  if(result.error)throw result.error;
+  if(signUp&&!result.data.session){setCloudStatus("حساب ساخته شد. اگر تأیید ایمیل در Supabase فعال باشد، ابتدا ایمیل را تأیید کنید و سپس وارد شوید.");return;}
+  cloudUser=result.data.user||result.data.session?.user||null;updateCloudUI();if(cloudUser)await syncAllCloudData(false);
+ }catch(e){setCloudStatus("ورود/ثبت‌نام ناموفق بود: "+(e.message||"خطای نامشخص"));}
+}
+async function cloudSignOut(){if(!cloudClient)return;const {error}=await cloudClient.auth.signOut();if(error){setCloudStatus("خروج انجام نشد: "+error.message);return;}cloudUser=null;updateCloudUI();}
+function toCloudMember(m){return {id:m.id,user_id:cloudUser.id,name:m.name,archived_at:m.archivedAt||null,created_at:m.createdAt||new Date().toISOString(),updated_at:m.updatedAt||new Date().toISOString()};}
+function fromCloudMember(m){return {id:m.id,name:m.name,archivedAt:m.archived_at||null,createdAt:m.created_at||new Date().toISOString(),updatedAt:m.updated_at||m.created_at||new Date().toISOString()};}
+async function syncOneFamilyMember(member){
+ if(!cloudClient||!cloudUser)return;
+ try{const {error}=await cloudClient.from("family_members").upsert(toCloudMember(member),{onConflict:"id"});if(error)throw error;setCloudStatus("تغییر فرد در فضای ابری ذخیره شد.");}
+ catch(e){setCloudStatus("ذخیره ابری انجام نشد؛ نسخه محلی محفوظ است. خطا: "+(e.message||"نامشخص"));}
+}
+async function syncFamilyMembers(){
+ if(!cloudClient||!cloudUser||cloudBusy)return;cloudBusy=true;
+ try{
+  setCloudStatus("در حال دریافت و همگام‌سازی افراد…");
+  const {data:remote,error}=await cloudClient.from("family_members").select("id,user_id,name,archived_at,created_at,updated_at").eq("user_id",cloudUser.id);
+  if(error)throw error;
+  const localById=new Map(db.familyMembers.map(m=>[m.id,m]));
+  const remoteById=new Map((remote||[]).map(r=>[r.id,fromCloudMember(r)]));
+  const merged=new Map();
+  for(const id of new Set([...localById.keys(),...remoteById.keys()])){
+   const l=localById.get(id),r=remoteById.get(id);
+   if(!l){merged.set(id,r);continue;}if(!r){merged.set(id,l);await upsertCloudMember(l);continue;}
+   const lt=Date.parse(l.updatedAt||0)||0,rt=Date.parse(r.updatedAt||0)||0;
+   if(lt>rt){merged.set(id,l);await upsertCloudMember(l);}else merged.set(id,r);
+  }
+  db.familyMembers=[...merged.values()].sort((a,b)=>a.name.localeCompare(b.name,"fa"));save();refreshFamilyManager();populateFamilySelect();renderReports();
+  setCloudStatus(`همگام‌سازی انجام شد؛ ${db.familyMembers.length} فرد در حساب ابری موجود است.`);
+ }catch(e){setCloudStatus("همگام‌سازی انجام نشد؛ اطلاعات محلی دست‌نخورده ماند. خطا: "+(e.message||"نامشخص"));}
+ finally{cloudBusy=false;}
+}
+async function upsertCloudMember(member){const {error}=await cloudClient.from("family_members").upsert(toCloudMember(member),{onConflict:"id"});if(error)throw error;}
+function categoryKey(kind,name){return kind+"::"+name;}
+function localCategoryTree(){
+ const rows=[];
+ for(const kind of ["expense","income"]){
+  for(const name of allCats(true)){
+   rows.push({kind,name,parentName:null,archived:db.archivedCategories.includes(name)});
+   for(const sub of subCats(name,true))rows.push({kind,name:sub,parentName:name,archived:(db.archivedSubcategories[name]||[]).includes(sub)});
+  }
+ }
+ return rows;
+}
+async function syncCloudCategories(){
+ const {data:remote,error}=await cloudClient.from("categories").select("id,user_id,name,kind,parent_id,archived_at,created_at").eq("user_id",cloudUser.id);
+ if(error)throw error;
+ const remoteById=new Map((remote||[]).map(r=>[r.id,r]));
+ // Bring custom categories created on another device into the local catalog.
+ for(const r of (remote||[])){
+  if(!r.parent_id){
+   if(!db.categoryConfig[r.name])db.categoryConfig[r.name]=[];
+   if(!db.categories.includes(r.name))db.categories.push(r.name);
+   if(r.archived_at&&!db.archivedCategories.includes(r.name))db.archivedCategories.push(r.name);
+  }else{
+   const parent=remoteById.get(r.parent_id);
+   if(parent){db.categoryConfig[parent.name]=db.categoryConfig[parent.name]||[];if(!db.categoryConfig[parent.name].includes(r.name))db.categoryConfig[parent.name].push(r.name);}
+  }
+ }
+ const byKey=new Map((remote||[]).map(r=>[categoryKey(r.kind,r.name)+(r.parent_id?"::child":"::root"),r]));
+ const rows=localCategoryTree(), idByKey=new Map();
+ for(const r of rows){
+  const k=categoryKey(r.kind,r.name)+(r.parentName?"::child":"::root");
+  const found=byKey.get(k), saved=db.cloudCategoryMap[k];
+  const id=found?.id||saved||(crypto.randomUUID?crypto.randomUUID():null);
+  if(!id)throw Error("امکان ساخت شناسه دسته‌بندی وجود ندارد");
+  db.cloudCategoryMap[k]=id;idByKey.set(k,id);
+ }
+ const payload=rows.map(r=>{
+  const k=categoryKey(r.kind,r.name)+(r.parentName?"::child":"::root");
+  const pk=r.parentName?categoryKey(r.kind,r.parentName)+"::root":null;
+  const previous=byKey.get(k);
+  return {id:idByKey.get(k),user_id:cloudUser.id,household_id:null,name:r.name,kind:r.kind,parent_id:pk?idByKey.get(pk):null,archived_at:r.archived?(previous?.archived_at||new Date().toISOString()):null,created_at:previous?.created_at||new Date().toISOString()};
+ });
+ if(payload.length){const {error:upErr}=await cloudClient.from("categories").upsert(payload,{onConflict:"id"});if(upErr)throw upErr;}
+ save();
+ const mapById=new Map();for(const [k,id] of idByKey)mapById.set(id,k);
+ return {idByKey,mapById};
+}
+function toCloudTransaction(t,categoryMaps){
+ const rootKey=categoryKey(t.type,t.category)+"::root";
+ const subKey=t.subcategory?categoryKey(t.type,t.subcategory)+"::child":null;
+ const extra={__chortkeh_v1:true,quantity:t.quantity??null,unit:t.unit||"",person:t.person||"",description:t.description||""};
+ return {id:t.id,user_id:cloudUser.id,created_by:cloudUser.id,household_id:null,kind:t.type,title:t.title,amount_toman:t.amount,currency_code:"IRR",transaction_date:t.date,category_id:categoryMaps.idByKey.get(rootKey)||null,subcategory_id:subKey?(categoryMaps.idByKey.get(subKey)||null):null,family_member_id:t.familyMemberId||null,person_label:t.person||null,description:JSON.stringify(extra),created_at:t.createdAt||new Date().toISOString(),updated_at:t.updatedAt||t.createdAt||new Date().toISOString()};
+}
+function fromCloudTransaction(r,categoryMaps){
+ let extra={};try{extra=JSON.parse(r.description||"{}");}catch{}
+ const root=categoryMaps.mapById.get(r.category_id)||"";
+ const sub=categoryMaps.mapById.get(r.subcategory_id)||"";
+ const category=root.includes("::")?root.split("::")[1]:"سایر";
+ const subcategory=sub.includes("::")?sub.split("::")[1]:"";
+ return {id:r.id,type:r.kind,amount:Number(r.amount_toman),title:r.title,category,subcategory,familyMemberId:r.family_member_id||null,date:r.transaction_date,quantity:extra.__chortkeh_v1?extra.quantity:null,unit:extra.__chortkeh_v1?extra.unit:"",person:extra.__chortkeh_v1?extra.person:(r.person_label||""),description:extra.__chortkeh_v1?(extra.description||""):"",createdAt:r.created_at,updatedAt:r.updated_at};
+}
+async function syncAllCloudData(showMessage=true){
+ if(!cloudClient||!cloudUser){if(showMessage)alert("ابتدا وارد حساب ابری شوید.");return;}
+ if(cloudBusy)return;cloudBusy=true;
+ try{
+  setCloudStatus("در حال تهیه نسخه پشتیبان داخلی و همگام‌سازی…");
+  const raw=localStorage.getItem(KEY);if(raw!==null&&!localStorage.getItem(KEY+"_pre_cloud_sync_v1"))localStorage.setItem(KEY+"_pre_cloud_sync_v1",raw);
+  // Merge remote family members first so transactions can resolve their family_member_id.
+  const {data:remoteMembers,error:memberErr}=await cloudClient.from("family_members").select("id,user_id,name,archived_at,created_at,updated_at").eq("user_id",cloudUser.id);
+  if(memberErr)throw memberErr;
+  const memberMap=new Map(db.familyMembers.map(m=>[m.id,m]));
+  for(const r of (remoteMembers||[])){
+   const rm=fromCloudMember(r),lm=memberMap.get(r.id);
+   if(!lm)memberMap.set(r.id,rm);
+   else if((Date.parse(r.updated_at||0)||0)>(Date.parse(lm.updatedAt||0)||0))memberMap.set(r.id,rm);
+  }
+  db.familyMembers=[...memberMap.values()];
+  // Upload local/newer members before transactions because of the foreign-key relation.
+  const remoteMemberIds=new Set((remoteMembers||[]).map(m=>m.id));
+  for(const m of db.familyMembers){const remote=(remoteMembers||[]).find(x=>x.id===m.id);if(!remote||((Date.parse(m.updatedAt||0)||0)>(Date.parse(remote.updated_at||0)||0)))await upsertCloudMember(m);}
+  const categoryMaps=await syncCloudCategories();
+  // Read remote transactions BEFORE writing. This prevents an older local copy
+  // from overwriting a newer cloud record during the merge.
+  const {data:remoteTx,error:txErr}=await cloudClient.from("transactions").select("id,user_id,kind,title,amount_toman,currency_code,transaction_date,category_id,subcategory_id,family_member_id,person_label,description,created_at,updated_at").eq("user_id",cloudUser.id);
+  if(txErr)throw txErr;
+  const localById=new Map(db.transactions.map(t=>[t.id,t]));
+  const remoteById=new Map((remoteTx||[]).map(r=>[r.id,r]));
+  const merged=new Map();
+  const upload=[];
+  for(const id of new Set([...localById.keys(),...remoteById.keys()])){
+   const local=localById.get(id),remote=remoteById.get(id);
+   if(!local){merged.set(id,fromCloudTransaction(remote,categoryMaps));continue;}
+   if(!remote){merged.set(id,local);upload.push(toCloudTransaction(local,categoryMaps));continue;}
+   const lt=Date.parse(local.updatedAt||local.createdAt||0)||0;
+   const rt=Date.parse(remote.updated_at||remote.created_at||0)||0;
+   if(lt>rt){merged.set(id,local);upload.push(toCloudTransaction(local,categoryMaps));}
+   else merged.set(id,fromCloudTransaction(remote,categoryMaps));
+  }
+  if(upload.length){const {error}=await cloudClient.from("transactions").upsert(upload,{onConflict:"id"});if(error)throw error;}
+  db.transactions=[...merged.values()].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  save();populateFamilySelect();refreshFamilyManager();render();
+  setCloudStatus(`همگام‌سازی کامل شد؛ ${db.transactions.length} تراکنش و ${db.familyMembers.length} فرد در دسترس است.`);
+ }catch(e){setCloudStatus("همگام‌سازی کامل نشد؛ نسخه محلی و پشتیبان داخلی حفظ شدند. خطا: "+(e.message||"نامشخص"));}
+ finally{cloudBusy=false;}
+}
+// Cloud controls are optional in this build. Missing controls must never stop
+// the rest of the application script from initializing.
+const cloudLoginButton=document.getElementById("cloudLogin");
+const cloudSignupButton=document.getElementById("cloudSignup");
+const cloudLogoutButton=document.getElementById("cloudLogout");
+if(cloudLoginButton)cloudLoginButton.addEventListener("click",()=>cloudSignIn(false));
+if(cloudSignupButton)cloudSignupButton.addEventListener("click",()=>cloudSignIn(true));
+if(cloudLogoutButton)cloudLogoutButton.addEventListener("click",cloudSignOut);
+
+function addCategory(){const name=(prompt("نام دسته اصلی جدید:")||"").trim();if(!name)return;if(allCats(true).includes(name)){alert("این دسته از قبل وجود دارد.");return;}db.categoryConfig[name]=[];db.categories.push(name);try{save();refreshCategoryManager();populateCats(name);}catch(e){alert(e.message);}}
+function renameCategory(oldName){const name=(prompt("نام جدید دسته:",oldName)||"").trim();if(!name||name===oldName)return;if(allCats(true).includes(name)){alert("این نام از قبل وجود دارد.");return;}db.categoryConfig[name]=db.categoryConfig[oldName]||[];delete db.categoryConfig[oldName];db.transactions.forEach(t=>{if(t.category===oldName)t.category=name;});db.categories=db.categories.map(x=>x===oldName?name:x);db.archivedCategories=db.archivedCategories.map(x=>x===oldName?name:x);if(db.archivedSubcategories[oldName]){db.archivedSubcategories[name]=db.archivedSubcategories[oldName];delete db.archivedSubcategories[oldName];}save();render();refreshCategoryManager();populateCats(name);}
+function toggleArchiveCategory(cat,archive){db.archivedCategories=db.archivedCategories.filter(x=>x!==cat);if(archive)db.archivedCategories.push(cat);save();refreshCategoryManager();populateCats();}
+function addSubcategory(cat){const name=(prompt("نام زیرگروه جدید:")||"").trim();if(!name)return;if(subCats(cat,true).includes(name)){alert("این زیرگروه از قبل وجود دارد.");return;}db.categoryConfig[cat]=db.categoryConfig[cat]||[];db.categoryConfig[cat].push(name);save();refreshCategoryManager();populateCats(cat,name);}
+function renameSubcategory(cat,oldName){const name=(prompt("نام جدید زیرگروه:",oldName)||"").trim();if(!name||name===oldName)return;if(subCats(cat,true).includes(name)){alert("این نام از قبل وجود دارد.");return;}db.categoryConfig[cat]=(db.categoryConfig[cat]||[]).map(x=>x===oldName?name:x);db.transactions.forEach(t=>{if(t.category===cat&&t.subcategory===oldName)t.subcategory=name;});if(db.archivedSubcategories[cat])db.archivedSubcategories[cat]=db.archivedSubcategories[cat].map(x=>x===oldName?name:x);save();render();refreshCategoryManager();populateCats(cat,name);}
+function toggleArchiveSub(cat,sub,archive){db.archivedSubcategories[cat]=db.archivedSubcategories[cat]||[];db.archivedSubcategories[cat]=db.archivedSubcategories[cat].filter(x=>x!==sub);if(archive)db.archivedSubcategories[cat].push(sub);save();refreshCategoryManager();populateCats(cat);}
+function populateCats(selected,sub){
+ const c=document.getElementById("category"),s=document.getElementById("subcategory");c.innerHTML="";
+ allCats().forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;c.append(o)});
+ if(selected&&allCats().includes(selected))c.value=selected;
+ populateSubs(sub);
+}
+function populateSubs(selected){
+ const c=document.getElementById("category").value,s=document.getElementById("subcategory");s.innerHTML="";
+ const list=activeSubCats(c).filter(x=>!(db.archivedSubcategories?.[c]||[]).includes(x));const none=document.createElement("option");none.value="";none.textContent="بدون زیرگروه";s.append(none);
+ list.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;s.append(o)});
+ const custom=document.createElement("option");custom.value="__new__";custom.textContent="＋ افزودن زیرگروه جدید";s.append(custom);
+ if(selected&&list.includes(selected))s.value=selected;
+}
+document.getElementById("category").addEventListener("change",()=>populateSubs());
+document.getElementById("subcategory").addEventListener("change",e=>{if(e.target.value==="__new__"){const name=prompt("نام زیرگروه جدید را وارد کن:");if(name&&name.trim()){const o=document.createElement("option");o.value=name.trim();o.textContent=name.trim();e.target.insertBefore(o,e.target.lastElementChild);e.target.value=name.trim();}else e.target.value="";}});
+let currentType="expense";
+document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>{currentType=b.dataset.type;document.querySelectorAll("[data-type]").forEach(x=>x.classList.toggle("active",x===b));});
+let installmentMode="store";
+function openInstallmentHub(){showPage("installmentPage",null,null,"اقساط");setInstallmentMode("store");document.getElementById("installmentPage").scrollIntoView({block:"start"});}
+function setInstallmentMode(mode){installmentMode=mode;document.getElementById("storeTab").classList.toggle("active",mode==="store");document.getElementById("bankTab").classList.toggle("active",mode==="bank");document.getElementById("installmentTitle").textContent=mode==="store"?"فروشگاه‌های اقساطی":"اقساط بانکی و سازمانی";document.getElementById("installmentDetail").style.display="none";renderInstallmentSources();}
+function renderInstallmentSources(){const root=document.getElementById("installmentSources");if(!root)return;root.innerHTML="";const list=db.installmentSources[installmentMode]||[];if(!list.length)root.innerHTML='<div class="installment-empty">هنوز موردی تعریف نشده است. با افزودن، نام فروشگاه یا بانک را وارد کن.</div>';list.forEach((name,i)=>{const row=document.createElement("div");row.className="installment-source";const label=document.createElement(installmentMode==="store"?"button":"b");label.textContent=name;if(installmentMode==="store"){label.type="button";label.style.cssText="border:0;background:transparent;color:var(--primary);font:inherit;font-weight:800;text-align:right;padding:4px;cursor:pointer";label.onclick=()=>showInstallmentSource(name);}const actions=document.createElement("div");const open=document.createElement("button");open.textContent=installmentMode==="store"?"ورود به فروشگاه":"ثبت پرداخت قسط";open.onclick=()=>showInstallmentSource(name);const edit=document.createElement("button");edit.textContent="تغییر نام";edit.style.marginRight="5px";edit.onclick=()=>renameInstallmentSource(i);actions.append(open,edit);row.append(label,actions);root.append(row);});if(installmentMode==="bank"){const ledger=document.createElement("div");ledger.className="panel";ledger.style.marginTop="14px";const title=document.createElement("h3");title.textContent="همه پرداخت‌های بانکی و سازمانی";ledger.append(title);const payments=(db.bankPayments||[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));if(!payments.length){const empty=document.createElement("div");empty.className="empty";empty.textContent="هنوز پرداختی ثبت نشده است.";ledger.append(empty);}else payments.forEach(x=>{const r=document.createElement("div");r.className="reportrow";const info=document.createElement("div");const name=document.createElement("b");name.textContent=x.source||"بدون عنوان";const date=document.createElement("small");date.textContent=displayDate(x.date)+(x.note?" · "+x.note:"");info.append(name,date);const amount=document.createElement("b");amount.textContent=money(x.amount);r.append(info,amount);ledger.append(r);});root.append(ledger);}}
+function addInstallmentSource(){const label=installmentMode==="store"?"نام فروشگاه اقساطی":"نام بانک یا سازمان";const name=(prompt(label+" را وارد کن:")||"").trim();if(!name)return;const list=db.installmentSources[installmentMode];if(list.some(x=>x.toLocaleLowerCase()===name.toLocaleLowerCase())){alert("این نام قبلاً ثبت شده است.");return;}list.push(name);save();renderInstallmentSources();}
+function renameInstallmentSource(i){const list=db.installmentSources[installmentMode],old=list[i];const name=(prompt("نام جدید:",old)||"").trim();if(!name||name===old)return;list[i]=name;save();renderInstallmentSources();}
+function showInstallmentSource(name){const box=document.getElementById("installmentDetail");box.style.display="block";box.innerHTML="";const h=document.createElement("h3");h.textContent=name;box.append(h);if(installmentMode==="bank"){const form=document.createElement("form");form.innerHTML='<div class="field"><label>تاریخ پرداخت</label><input type="date" id="bankPayDate" required></div><div class="field"><label>مبلغ قسط پرداخت‌شده (تومان)</label><input type="number" id="bankPayAmount" min="1" required></div><div class="field"><label>توضیح (اختیاری)</label><input id="bankPayNote"></div><button class="btn">ثبت پرداخت</button>';form.querySelector('#bankPayDate').value=new Date().toISOString().slice(0,10);form.onsubmit=e=>{e.preventDefault();db.bankPayments.push({id:crypto.randomUUID(),source:name,date:form.querySelector('#bankPayDate').value,amount:+form.querySelector('#bankPayAmount').value,note:form.querySelector('#bankPayNote').value});save();showInstallmentSource(name);render();};box.append(form);const list=db.bankPayments.filter(x=>x.source===name);box.insertAdjacentHTML('beforeend','<h4>سوابق پرداخت</h4>');list.forEach(x=>{const r=document.createElement('div');r.className='reportrow';r.textContent=displayDate(x.date)+' · '+money(x.amount)+(x.note?' · '+x.note:'');box.append(r);});return;}
+const form=document.createElement("form");form.innerHTML='<div class="field"><label>کد سفارش</label><input id="orderCode" required></div><div id="orderItems"></div><button type="button" class="btn secondary" id="addOrderItem">＋ افزودن کالا</button><div class="field"><label>هزینه ارسال (تومان، اختیاری)</label><input id="shipping" type="number" min="0" value="0"></div><div class="field"><label>مبلغ پرداخت اولیه (تومان)</label><input id="downPayment" type="number" min="0" value="0" required></div><div class="field"><label>تاریخ خرید</label><input id="purchaseDate" type="date" required></div><div class="field"><label>تعداد اقساط</label><input id="installmentCount" type="number" min="1" value="1" required></div><div class="field"><label>مبلغ هر قسط (تومان)</label><input id="installmentAmount" type="number" min="1" required></div><div class="field"><label>سررسید هر قسط</label><div id="installmentDueDates"></div></div><button class="btn">ثبت سفارش</button>';form.querySelector('#purchaseDate').value=new Date().toISOString().slice(0,10);let items=[];function addItem(){const wrap=document.createElement('div');wrap.className='panel';wrap.style.margin='8px 0';wrap.innerHTML='<div class="field"><label>نام کالا</label><input class="item-title" required></div><div class="formgrid"><div class="field"><label>تعداد</label><input class="item-qty" type="number" min="1" value="1" required></div><div class="field"><label>مبلغ کل قلم (تومان)</label><input class="item-amount" type="number" min="1" required></div></div><div class="field"><label>صاحب هزینه</label><select class="item-owner"><option value="">هزینه جاری</option>'+db.familyMembers.filter(m=>!m.archivedAt).map(m=>'<option value="'+m.id+'">'+escapeHtml(m.name)+'</option>').join('')+'</select></div><button type="button" class="btn light remove-item">حذف قلم</button>';wrap.querySelector('.remove-item').onclick=()=>wrap.remove();form.querySelector('#orderItems').append(wrap);}form.querySelector('#addOrderItem').onclick=addItem;addItem();function dueInputs(){const host=form.querySelector('#installmentDueDates');host.innerHTML='';for(let i=1;i<=Math.min(60,+form.querySelector('#installmentCount').value||1);i++){const lab=document.createElement('label');lab.className='field';lab.textContent='قسط '+i;const inp=document.createElement('input');inp.type='date';inp.className='due-date';inp.required=true;lab.append(inp);host.append(lab);}}form.querySelector('#installmentCount').addEventListener('change',dueInputs);dueInputs();form.onsubmit=e=>{e.preventDefault();const nodes=[...form.querySelectorAll('#orderItems>.panel')];const goods=nodes.map(n=>({title:n.querySelector('.item-title').value.trim(),quantity:+n.querySelector('.item-qty').value,amount:+n.querySelector('.item-amount').value,ownerId:n.querySelector('.item-owner').value||null}));if(!goods.length||goods.some(x=>!x.title||x.amount<=0)){alert('حداقل یک کالای معتبر وارد کن.');return;}const total=goods.reduce((a,x)=>a+x.amount,0)+(+form.querySelector('#shipping').value||0),count=+form.querySelector('#installmentCount').value,inst=+form.querySelector('#installmentAmount').value,down=+form.querySelector('#downPayment').value;if(down+count*inst!==total){alert('مبلغ پرداخت اولیه به‌علاوه مجموع اقساط باید با مبلغ کل سفارش برابر باشد. مبلغ کل: '+money(total));return;}const code=form.querySelector('#orderCode').value.trim();if(db.installmentOrders.some(o=>o.store===name&&o.code===code)){alert('این کد سفارش برای این فروشگاه قبلاً ثبت شده است.');return;}db.installmentOrders.push({id:crypto.randomUUID(),store:name,code,items:goods,shipping:+form.querySelector('#shipping').value||0,total,downPayment:down,purchaseDate:form.querySelector('#purchaseDate').value,installments:Array.from({length:count},(_,i)=>({number:i+1,amount:inst,dueDate:form.querySelectorAll('.due-date')[i].value,paid:false,paidDate:null}))});save();showInstallmentSource(name);render();};box.append(form);const orders=db.installmentOrders.filter(o=>o.store===name);const list=document.createElement('div');list.innerHTML='<h4>سفارش‌های ثبت‌شده</h4>';orders.forEach(o=>{const card=document.createElement('div');card.className='panel';card.style.margin='8px 0';const head=document.createElement('b');head.textContent='کد '+o.code+' · '+money(o.total);card.append(head);o.items.forEach(it=>{const d=document.createElement('div');d.className='tx';d.textContent=it.title+' · '+money(it.amount)+' · '+(memberName(it.ownerId)||'هزینه جاری');card.append(d);});o.installments.forEach(ins=>{const row=document.createElement('div');row.className='reportrow';row.innerHTML='<span>قسط '+ins.number+' از '+o.installments.length+' · '+money(ins.amount)+'</span>';const btn=document.createElement('button');btn.className='btn '+(ins.paid?'light':'secondary');btn.textContent=ins.paid?'پرداخت شده':'ثبت پرداخت';btn.onclick=()=>{if(ins.paid)return;ins.paid=true;ins.paidDate=new Date().toISOString().slice(0,10);save();showInstallmentSource(name);};row.append(btn);card.append(row);});list.append(card);});box.append(list);}
+function openBalancePage(){showPage('specialPage',null,null,'افزودن موجودی');const root=document.getElementById('specialContent');root.innerHTML='<h3>افزودن موجودی</h3><form id="balanceForm"><div class="field"><label>مبلغ (تومان)</label><input id="balanceAmount" type="number" min="1" required></div><div class="field"><label>تاریخ</label><input id="balanceDate" type="date" required></div><div class="field"><label>توضیح (اختیاری)</label><input id="balanceNote"></div><button class="btn">افزودن به موجودی کل</button></form><h4>سوابق افزایش موجودی</h4><div id="balanceHistory"></div>';root.querySelector('#balanceDate').value=new Date().toISOString().slice(0,10);root.querySelector('#balanceForm').onsubmit=e=>{e.preventDefault();db.balanceAdds.push({id:crypto.randomUUID(),amount:+root.querySelector('#balanceAmount').value,date:root.querySelector('#balanceDate').value,note:root.querySelector('#balanceNote').value});save();render();openBalancePage();};(db.balanceAdds||[]).slice().reverse().forEach(x=>{const d=document.createElement('div');d.className='reportrow';d.textContent=displayDate(x.date)+' · '+money(x.amount)+(x.note?' · '+x.note:'');root.querySelector('#balanceHistory').append(d);});}
+function openTransportPage(){showPage('specialPage',null,null,'حمل‌ونقل');const root=document.getElementById('specialContent');root.innerHTML='<h3>ثبت کرایه و رفت‌وآمد</h3><form id="transportForm"><div class="field"><label>نوع رفت‌وآمد</label><select id="trType"><option>تاکسی</option><option>مترو</option><option>اتوبوس</option><option>هواپیما</option></select></div><div class="field"><label>مبلغ (تومان)</label><input id="trAmount" type="number" min="1" required></div><div class="field"><label>توضیحات (اختیاری)</label><textarea id="trDescription" rows="2" placeholder="مثلاً مسیر یا دلیل سفر" style="width:100%;padding:12px;border:1px solid #dfe5ef;border-radius:12px;font:inherit"></textarea></div><div class="field"><label>صاحب هزینه</label><select id="trOwner"><option value="">بدون انتساب</option>'+db.familyMembers.filter(m=>!m.archivedAt).map(m=>'<option value="'+m.id+'">'+escapeHtml(m.name)+'</option>').join('')+'</select></div><div class="field"><label>تاریخ</label><input id="trDate" type="date" required></div><button class="btn">ثبت هزینه رفت‌وآمد</button></form><h4>سوابق حمل‌ونقل</h4>';root.querySelector('#trDate').value=new Date().toISOString().slice(0,10);root.querySelector('#transportForm').onsubmit=e=>{e.preventDefault();const amount=+root.querySelector('#trAmount').value;if(!Number.isSafeInteger(amount)||amount<1)return;const now=new Date().toISOString(),kind=root.querySelector('#trType').value;db.transactions.push({id:crypto.randomUUID(),type:'expense',amount,title:kind,category:'حمل‌ونقل',subcategory:kind,description:root.querySelector('#trDescription').value.trim(),familyMemberId:root.querySelector('#trOwner').value||null,date:root.querySelector('#trDate').value,createdAt:now,updatedAt:now});save();render();openTransportPage();};db.transactions.filter(t=>t.category==='حمل‌ونقل').slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(t=>{const d=document.createElement('div');d.className='reportrow';d.textContent=displayDate(t.date)+' · '+t.title+' · '+(memberName(t.familyMemberId)||'بدون انتساب')+' · '+money(t.amount)+(t.description?' · '+t.description:'');root.append(d);});}
+function openVehiclePage(){showPage('specialPage',null,null,'هزینه‌های خودرو');const root=document.getElementById('specialContent');const known=[...new Set([...(db.vehicleItems||[]),...db.transactions.filter(t=>t.category==='خودرو').map(t=>t.title)].filter(Boolean))];root.innerHTML='<h3>ثبت هزینه خودرو</h3><p class="muted">نام موارد را یک‌بار وارد کن؛ دفعات بعد با نوشتن چند حرف، پیشنهادها نمایش داده می‌شوند.</p><form id="vehicleForm"><div class="field"><label>نوع هزینه خودرو</label><input id="vehicleItem" list="vehicleItemSuggestions" autocomplete="off" placeholder="مثلاً بنزین، روغن موتور، تعویض لاستیک" required><datalist id="vehicleItemSuggestions">'+known.map(x=>'<option value="'+escapeHtml(x)+'"></option>').join('')+'</datalist></div><div class="field"><label>مبلغ (تومان)</label><input id="vehicleAmount" type="number" min="1" step="1" required></div><div class="field"><label>صاحب هزینه</label><select id="vehicleOwner"><option value="">بدون انتساب</option>'+db.familyMembers.filter(m=>!m.archivedAt).map(m=>'<option value="'+m.id+'">'+escapeHtml(m.name)+'</option>').join('')+'</select></div><div class="field"><label>تاریخ</label><input id="vehicleDate" type="date" required></div><button class="btn">ثبت هزینه خودرو</button></form><h4>سوابق هزینه خودرو</h4>';root.querySelector('#vehicleDate').value=new Date().toISOString().slice(0,10);root.querySelector('#vehicleForm').onsubmit=e=>{e.preventDefault();const title=root.querySelector('#vehicleItem').value.trim(),amount=+root.querySelector('#vehicleAmount').value,date=root.querySelector('#vehicleDate').value;if(!title||!Number.isSafeInteger(amount)||amount<1||!date)return;db.vehicleItems=db.vehicleItems||[];if(!db.vehicleItems.some(x=>x.toLocaleLowerCase()===title.toLocaleLowerCase()))db.vehicleItems.push(title);db.categoryConfig=db.categoryConfig||{};db.categoryConfig['خودرو']=db.categoryConfig['خودرو']||[];if(!db.categoryConfig['خودرو'].includes(title))db.categoryConfig['خودرو'].push(title);const now=new Date().toISOString();db.transactions.push({id:crypto.randomUUID(),type:'expense',amount,title,category:'خودرو',subcategory:title,familyMemberId:root.querySelector('#vehicleOwner').value||null,date,createdAt:now,updatedAt:now});save();render();openVehiclePage();};db.transactions.filter(t=>t.category==='خودرو').slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(t=>{const d=document.createElement('div');d.className='reportrow';d.textContent=displayDate(t.date)+' · '+t.title+' · '+(memberName(t.familyMemberId)||'بدون انتساب')+' · '+money(t.amount);root.append(d);});}
+
+function openRentPage(){showPage('specialPage',null,null,'اجاره');const root=document.getElementById('specialContent');root.innerHTML='<h3>مدیریت اجاره‌ها</h3><form id="rentTypeForm"><div class="field"><label>عنوان اجاره جدید</label><input id="rentTypeName" placeholder="مثلاً اجاره خانه یا دفتر" required></div><button class="btn secondary">＋ افزودن عنوان اجاره</button></form><div id="rentTypeList"></div>';const list=root.querySelector('#rentTypeList');(db.rentTypes||[]).forEach(name=>{const card=document.createElement('div');card.className='panel';card.style.margin='10px 0';const h=document.createElement('h4');h.textContent=name;card.append(h);const f=document.createElement('form');f.innerHTML='<div class="field"><label>مبلغ پرداخت (تومان)</label><input type="number" min="1" class="rent-amount" required></div><div class="field"><label>تاریخ پرداخت</label><input type="date" class="rent-date" required></div><button class="btn">ثبت پرداخت اجاره</button>';f.querySelector('.rent-date').value=new Date().toISOString().slice(0,10);f.onsubmit=e=>{e.preventDefault();db.transactions.push({id:crypto.randomUUID(),type:'expense',amount:+f.querySelector('.rent-amount').value,title:name,category:'اجاره',subcategory:name,familyMemberId:null,date:f.querySelector('.rent-date').value,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});save();render();openRentPage();};card.append(f);db.transactions.filter(t=>t.category==='اجاره'&&t.title===name).forEach(t=>{const r=document.createElement('div');r.className='reportrow';r.textContent=displayDate(t.date)+' · '+money(t.amount);card.append(r);});list.append(card);});root.querySelector('#rentTypeForm').onsubmit=e=>{e.preventDefault();const n=root.querySelector('#rentTypeName').value.trim();if(n&&!db.rentTypes.includes(n)){db.rentTypes.push(n);save();openRentPage();}};}
+function showPage(id,type,cat,contextTitle){
+ const target=document.getElementById(id);
+ if(!target){console.error("صفحه پیدا نشد:",id);return;}
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p===target));
+ const navPage=(id==="specialPage"||id==="installmentPage"||id==="peoplePage"||id==="addPage"||id==="transactionsPage")?"homePage":id;
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===navPage));
+ const defaults={homePage:"خانه",addPage:type==="income"?"ثبت درآمد":"هزینه‌ها",installmentPage:"اقساط",specialPage:contextTitle||"بخش",peoplePage:"افراد",reportPage:"گزارش‌ها",transactionsPage:"تراکنش‌ها",settingsPage:"تنظیمات"};
+ const context=document.getElementById("pageContext"),title=document.getElementById("pageContextTitle"),trail=document.getElementById("pageContextTrail");
+ if(context){const isHome=id==="homePage";context.classList.toggle("hidden",isHome);if(title)title.textContent=contextTitle||defaults[id]||"بخش برنامه";if(trail)trail.textContent="";}
+ if(id==="addPage"){if(type){currentType=type;document.querySelectorAll("[data-type]").forEach(x=>x.classList.toggle("active",x.dataset.type===type));}populateCats(cat);}
+ window.scrollTo({top:0,behavior:"instant"});
+}
+function goHome(){showPage("homePage");window.scrollTo(0,0);}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const id=b.dataset.page;if(id==="homePage")goHome();else showPage(id);}));
+
+// Ask supported browsers to render native date controls in Persian locale.
+// Stored values remain ISO/Gregorian for database compatibility.
+function localizeDateControls(root=document){root.querySelectorAll('input[type="date"]').forEach(el=>{el.setAttribute('lang','fa-IR');el.setAttribute('dir','rtl');});}
+localizeDateControls();
+new MutationObserver(records=>records.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches?.('input[type="date"]')){n.setAttribute('lang','fa-IR');n.setAttribute('dir','rtl');}localizeDateControls(n);}}))).observe(document.body,{childList:true,subtree:true});
+
+// Persian calendar picker; dates are stored internally as Gregorian ISO dates for compatibility.
+function g2j(gy,gm,gd){
+ const gdm=[0,31,59,90,120,151,181,212,243,273,304,334];
+ let gy2=gm>2?gy+1:gy;
+ let days=355666+365*gy+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)+gd+gdm[gm-1];
+ let jy=-1595+33*Math.floor(days/12053);days%=12053;
+ jy+=4*Math.floor(days/1461);days%=1461;
+ if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365;}
+ let jm=days<186?1+Math.floor(days/31):7+Math.floor((days-186)/30);
+ let jd=1+(days<186?days%31:(days-186)%30);
+ return [jy,jm,jd];
+}
+function j2g(jy,jm,jd){
+ // Locate the first day of the requested Jalali year using the existing Gregorian-to-Jalali converter.
+ const startYear=jy+621; let start=null;
+ for(let day=19;day<=22;day++){
+  const candidate=new Date(Date.UTC(startYear,2,day));
+  const j=g2j(candidate.getUTCFullYear(),candidate.getUTCMonth()+1,candidate.getUTCDate());
+  if(j[0]===jy&&j[1]===1&&j[2]===1){start=candidate;break;}
+ }
+ if(!start) throw new Error("تبدیل تاریخ شمسی ناموفق بود");
+ const offset=(jm<=6?(jm-1)*31+jd-1:186+(jm-7)*30+jd-1);
+ start.setUTCDate(start.getUTCDate()+offset);
+ return `${start.getUTCFullYear()}-${String(start.getUTCMonth()+1).padStart(2,"0")}-${String(start.getUTCDate()).padStart(2,"0")}`;
+}
+const pMonths=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+document.getElementById("form").addEventListener("submit",e=>{
+ e.preventDefault();if(!storageReady){alert("برای محافظت از اطلاعات، ثبت تراکنش غیرفعال است.");return;}
+ const amount=Number(document.getElementById("amount").value),title=document.getElementById("title").value.trim();
+ if(!document.getElementById("date").value){alert("لطفاً تاریخ هزینه را انتخاب کن.");return;}
+ const quantity=Number(document.getElementById("quantity").value),unit=document.getElementById("unit").value.trim();
+ if(!Number.isSafeInteger(amount)||amount<=0||!title||!Number.isFinite(quantity)||quantity<=0||!unit){alert("عنوان، مقدار، واحد و مبلغ معتبر را وارد کن.");return;}
+ const tx={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),type:"expense",amount,title,category:document.getElementById("category").value,subcategory:document.getElementById("subcategory").value||"",person:"",familyMemberId:document.getElementById("familyMember").value||null,quantity,unit,description:document.getElementById("description").value.trim(),date:document.getElementById("date").value,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+ db.transactions.push(tx);try{save();}catch(err){db.transactions.pop();alert("ذخیره ناموفق بود: "+err.message);return;}
+ if(cloudClient&&cloudUser)syncAllCloudData(false);
+ // Keep the expense form open and retain the selected date for consecutive entries.
+ const selectedDate=document.getElementById("date").value;
+ e.target.reset();
+ document.getElementById("date").value=selectedDate;
+ ["title","quantity","unit","amount","description"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+ currentType="expense";
+ populateCats();populateFamilySelect();render();
+ document.getElementById("title").focus({preventScroll:true});
+ let msg=document.getElementById("expenseSaveNotice");if(!msg){msg=document.createElement("div");msg.id="expenseSaveNotice";msg.className="note";document.querySelector("#addPage .panel").prepend(msg);}msg.textContent="هزینه ثبت شد؛ تاریخ انتخاب‌شده حفظ شده است. می‌توانی هزینه بعدی را وارد کنی.";
+});
+
+let mergeStream=null,mergeScanTimer=null;
+function mergeNormalizeName(v){return String(v||"").replace(/[\u200c\s]+/g," ").replace(/[يى]/g,"ی").replace(/ك/g,"ک").trim().toLocaleLowerCase("fa-IR");}
+function mergeSetStatus(s){const e=document.getElementById("mergeStatus");if(e)e.textContent=s;}
+function createMergeQR(){
+ const from=document.getElementById("mergeFrom").value,to=document.getElementById("mergeTo").value;
+ if(!from||!to||from>to){mergeSetStatus("بازه زمانی معتبر انتخاب کن.");return;}
+ const rows=db.transactions.filter(t=>t.type==="expense"&&t.date>=from&&t.date<=to).map(t=>({id:t.id,date:t.date,amount:t.amount,title:t.title,category:t.category,subcategory:t.subcategory||"",ownerName:memberName(t.familyMemberId)||"",quantity:t.quantity||null,unit:t.unit||"",description:t.description||""}));
+ const payload={app:"chortkeh",schema:1,createdAt:new Date().toISOString(),from,to,transactions:rows};
+ const raw=JSON.stringify(payload);const box=document.getElementById("mergeQrBox");box.style.display="block";box.innerHTML="";
+ if(raw.length>1900){mergeSetStatus("این گزارش برای یک QR بزرگ است ("+rows.length+" هزینه). برای جلوگیری از QR ناخوانا، از انتقال فایل پشتیبان استفاده کن.");return;}
+ if(!window.QRCode){mergeSetStatus("کتابخانه ساخت QR بارگذاری نشده است؛ اینترنت را بررسی کن.");return;}
+ new QRCode(box,{text:raw,width:260,height:260,correctLevel:QRCode.CorrectLevel.L});
+ const caption=document.createElement("div");caption.className="muted";caption.style.marginTop="10px";caption.textContent="گزارش "+from+" تا "+to+" · "+rows.length+" هزینه · این تصویر حاوی اطلاعات مالی است.";box.append(caption);
+ mergeSetStatus("QR آماده است. گوشی دیگر می‌تواند آن را اسکن و گزارش را به اطلاعات خودش اضافه کند.");
+}
+async function startMergeScan(){
+ if(!("BarcodeDetector" in window)){mergeSetStatus("مرورگر این گوشی اسکن QR داخلی را پشتیبانی نمی‌کند؛ از دوربین گوشی یا انتقال فایل استفاده کن.");return;}
+ try{mergeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});const v=document.getElementById("mergeVideo");v.srcObject=mergeStream;await v.play();document.getElementById("mergeScanBox").style.display="block";const detector=new BarcodeDetector({formats:["qr_code"]});mergeSetStatus("دوربین فعال شد؛ QR گوشی دیگر را اسکن کن.");const scan=async()=>{if(!mergeStream)return;try{const codes=await detector.detect(v);if(codes.length){stopMergeScan();importMergePayload(codes[0].rawValue);return;}}catch(e){}mergeScanTimer=setTimeout(scan,450);};scan();}catch(e){mergeSetStatus("دسترسی دوربین داده نشد: "+(e.message||"خطا"));}
+}
+function stopMergeScan(){if(mergeScanTimer)clearTimeout(mergeScanTimer);mergeScanTimer=null;if(mergeStream){mergeStream.getTracks().forEach(t=>t.stop());mergeStream=null;}const box=document.getElementById("mergeScanBox");if(box)box.style.display="none";}
+function importMergePayload(raw){
+ try{const data=JSON.parse(raw);if(data.app!=="chortkeh"||data.schema!==1||!Array.isArray(data.transactions))throw Error("ساختار QR چرتکه معتبر نیست");
+  if(!confirm(""+data.transactions.length+" هزینه از "+data.from+" تا "+data.to+" دریافت می‌شود. موارد تکراری دوباره ثبت نمی‌شوند. ادامه می‌دهی؟"))return;
+  const byName=new Map(db.familyMembers.map(m=>[mergeNormalizeName(m.name),m.id]));const addedMembers=[];
+  const incomingNames=[...new Set(data.transactions.map(t=>mergeNormalizeName(t.ownerName)).filter(Boolean))];
+  incomingNames.forEach(n=>{if(!byName.has(n)){const display=data.transactions.find(t=>mergeNormalizeName(t.ownerName)===n).ownerName;const now=new Date().toISOString(),m={id:crypto.randomUUID(),name:display,archivedAt:null,createdAt:now,updatedAt:now};db.familyMembers.push(m);byName.set(n,m.id);addedMembers.push(m);}});
+  const ids=new Set(db.transactions.map(t=>t.id));let count=0;
+  data.transactions.forEach(t=>{if(!t||typeof t.id!=="string"||ids.has(t.id)||!Number.isSafeInteger(t.amount)||t.amount<=0||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(t.date))return;const owner=mergeNormalizeName(t.ownerName);db.transactions.push({id:t.id,type:"expense",amount:t.amount,title:String(t.title||"هزینه"),category:String(t.category||"سایر"),subcategory:String(t.subcategory||""),familyMemberId:owner?byName.get(owner)||null:null,person:"",date:t.date,quantity:t.quantity||null,unit:String(t.unit||""),description:String(t.description||""),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),mergedFrom:"qr"});ids.add(t.id);count++;});
+  try{save();}catch(e){throw e;}populateFamilySelect();refreshFamilyManager();refreshPeopleManager();refreshLocalManagerSelect();render();mergeSetStatus(count+" هزینه جدید و "+addedMembers.length+" فرد جدید اضافه شد. موارد تکراری نادیده گرفته شدند.");
+ }catch(e){mergeSetStatus("دریافت گزارش ناموفق بود: "+(e.message||"QR نامعتبر"));}
+}
+
+document.getElementById("form").addEventListener("reset",()=>{const d=document.getElementById("date"),keep=d?.value||new Date().toISOString().slice(0,10);setTimeout(()=>{if(d)d.value=keep;},0);});
+function download(name,content,type){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+function backup(){const raw=localStorage.getItem(KEY);if(!raw){alert("هنوز اطلاعاتی برای پشتیبان‌گیری وجود ندارد.");return;}download("chortkeh-backup-v1.6.json",raw,"application/json");}
+document.getElementById("restore").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const restored=migrate(JSON.parse(await f.text()));if(confirm("اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟ ابتدا نسخه فعلی را پشتیبان بگیر.")){const old=localStorage.getItem(KEY);if(old!==null)localStorage.setItem(KEY+"_before_restore_"+Date.now(),old);localStorage.setItem(KEY,JSON.stringify(restored));db=restored;storageReady=true;populateFamilySelect();refreshFamilyManager();render();alert("بازیابی انجام شد.");}}catch(err){alert("فایل پشتیبان معتبر نیست؛ اطلاعات فعلی تغییر نکرد.");}e.target.value="";});
+if(!storageReady){const warn=document.createElement("div");warn.className="note";warn.textContent="اطلاعات ذخیره‌شده قابل خواندن نیست؛ برای جلوگیری از بازنویسی، ثبت غیرفعال شده است. داده‌های مرورگر را پاک نکن.";document.querySelector("main").prepend(warn);document.querySelectorAll("#form input,#form select,#form button").forEach(x=>x.disabled=true);const raw=document.createElement("button");raw.className="btn secondary";raw.textContent="دریافت فایل خام اطلاعات";raw.onclick=()=>download("chortkeh-recovery.txt",localStorage.getItem(KEY)||"","text/plain");document.querySelector("#settingsPage .panel").append(raw);}
+if(storageReady){try{save();}catch(e){storageReady=false;}}
+const _mergeNow=new Date(),_mergeFirst=new Date(_mergeNow.getFullYear(),_mergeNow.getMonth(),1);const _isoLocal=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;document.getElementById("mergeFrom").value=_isoLocal(_mergeFirst);document.getElementById("mergeTo").value=_isoLocal(_mergeNow);
+populateCats();populateFamilySelect();render();refreshCategoryManager();refreshFamilyManager();refreshPeopleManager();refreshLocalManagerSelect();applyBalanceVisibility();updateHeaderDate();showPage("homePage");
+initCloud();
+</script>
+
+<style>
+/* One shared Persian calendar for every date field */
+.date-picker-trigger{width:100%;min-height:46px;text-align:right;direction:rtl;padding:12px 14px;border:1px solid #dfe5ef;border-radius:12px;background:#fff;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.date-picker-trigger .cal-icon{font-size:18px;color:var(--blue)}
+#persianCalendarOverlay{position:fixed;inset:0;background:#101a32a8;z-index:10000;display:none;align-items:center;justify-content:center;padding:16px}
+#persianCalendarOverlay.open{display:flex}
+.pcal{width:min(390px,100%);background:#fff;border-radius:22px;padding:17px;box-shadow:0 20px 70px #0004;color:var(--ink)}
+.pcal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.pcal-head strong{font-size:16px}.pcal-nav{width:42px;height:42px;border-radius:13px;background:#eef2ff;color:#315efb;font-size:20px}
+.pcal-week,.pcal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center}
+.pcal-week span{font-size:11px;color:#7b879b;padding:8px 0}
+.pcal-day{height:42px;border-radius:12px;background:#f5f7fb;color:#17243b;font-size:13px}
+.pcal-day:disabled{visibility:hidden}.pcal-day.selected{background:#315efb;color:white;font-weight:bold}.pcal-day.today{outline:2px solid #a9baff}
+.pcal-actions{display:flex;gap:8px;margin-top:15px}.pcal-actions button{flex:1;min-height:44px;border-radius:12px;font-weight:bold}.pcal-today{background:#eef2ff;color:#315efb}.pcal-close{background:#315efb;color:white}
+
+/* Compact vertical rhythm across the app */
+.field{margin:7px 0}.field label{margin-bottom:4px}.field input,.field select{padding:10px 11px}.panel{padding:11px}.sectionhead{margin:14px 2px 8px}.tx{padding:9px 0}.reportrow{padding:10px 2px}.installment-source{padding:8px 0}.installment-tabs{margin:8px 0;gap:7px}.installment-tab{padding:10px 7px}.item-row,.shipment-card{padding:9px!important}.item-row .field,.shipment-card .field{margin:6px 0}.item-row .btn,.shipment-card .btn{padding:10px 12px}
+</style>
+<div id="persianCalendarOverlay" aria-hidden="true">
+ <section class="pcal" role="dialog" aria-modal="true" aria-label="تقویم فارسی">
+  <div class="pcal-head"><button type="button" class="pcal-nav" id="pcalPrev" aria-label="ماه قبل">‹</button><strong id="pcalTitle">فروردین ۱۴۰۵</strong><button type="button" class="pcal-nav" id="pcalNext" aria-label="ماه بعد">›</button></div>
+  <div class="pcal-week"><span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span></div>
+  <div class="pcal-days" id="pcalDays"></div>
+  <div class="pcal-actions"><button type="button" class="pcal-today" id="pcalToday">امروز</button><button type="button" class="pcal-close" id="pcalClose">تأیید</button></div>
+ </section>
+</div>
+<script>
+(function(){
+ const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
+ const overlay=document.getElementById('persianCalendarOverlay'),title=document.getElementById('pcalTitle'),daysBox=document.getElementById('pcalDays');
+ const months=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+ const weekdayOffset=iso=>{const d=new Date(iso+'T12:00:00Z');return (d.getUTCDay()+1)%7;};
+ let target=null,viewY=1405,viewM=1,selectedIso='';
+ function isoToday(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+ function isoToJ(iso){if(!iso)return g2j(new Date().getFullYear(),new Date().getMonth()+1,new Date().getDate());const [y,m,d]=iso.split('-').map(Number);return g2j(y,m,d);}
+ function monthDays(y,m){if(m<=6)return 31;if(m<=11)return 30;return j2g(y,12,30)<j2g(y+1,1,1)?30:29;}
+ function render(){title.textContent=months[viewM-1]+' '+fa(viewY);daysBox.innerHTML='';const first=j2g(viewY,viewM,1),offset=weekdayOffset(first),count=monthDays(viewY,viewM);for(let i=0;i<offset;i++){const blank=document.createElement('button');blank.type='button';blank.disabled=true;blank.className='pcal-day';daysBox.append(blank);}for(let d=1;d<=count;d++){const iso=j2g(viewY,viewM,d),b=document.createElement('button');b.type='button';b.className='pcal-day'+(iso===selectedIso?' selected':'')+(iso===isoToday()?' today':'');b.textContent=fa(d);b.addEventListener('click',()=>{selectedIso=iso;render();});daysBox.append(b);}}
+ function open(input){target=input;selectedIso=input.value||isoToday();[viewY,viewM]=isoToJ(selectedIso);render();overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');}
+ function close(apply){if(apply&&target&&selectedIso){target._nativeDateSetter.call(target,selectedIso);target.dispatchEvent(new Event('change',{bubbles:true}));}overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');target=null;}
+ document.getElementById('pcalPrev').addEventListener('click',()=>{viewM--;if(viewM<1){viewM=12;viewY--;}render();});
+ document.getElementById('pcalNext').addEventListener('click',()=>{viewM++;if(viewM>12){viewM=1;viewY++;}render();});
+ document.getElementById('pcalToday').addEventListener('click',()=>{selectedIso=isoToday();[viewY,viewM]=isoToJ(selectedIso);render();});
+ document.getElementById('pcalClose').addEventListener('click',()=>close(true));
+ overlay.addEventListener('click',e=>{if(e.target===overlay)close(false);});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close(false);});
+ function display(input,button){const iso=input.value;button.querySelector('.date-label').textContent=iso?(()=>{const [y,m,d]=isoToJ(iso);return `${fa(d)} ${months[m-1]} ${fa(y)}`;})():'انتخاب تاریخ شمسی';}
+ function enhance(input){if(input.dataset.persianCalendar==='1')return;input.dataset.persianCalendar='1';input.dataset.wasRequired=input.required?'1':'0';input.required=false;const proto=HTMLInputElement.prototype,desc=Object.getOwnPropertyDescriptor(proto,'value');input._nativeDateSetter=desc.set;input._nativeDateGetter=desc.get;input.type='hidden';const button=document.createElement('button');button.type='button';button.className='date-picker-trigger';button.innerHTML='<span class="date-label">انتخاب تاریخ شمسی</span><span class="cal-icon" aria-hidden="true">▦</span>';input.insertAdjacentElement('afterend',button);button.addEventListener('click',()=>open(input));Object.defineProperty(input,'value',{configurable:true,get(){return this._nativeDateGetter.call(this);},set(v){this._nativeDateSetter.call(this,v);display(this,button);}});display(input,button);}
+ function scan(root){if(root.nodeType!==1&&root!==document)return;if(root.matches?.('input[type="date"]'))enhance(root);root.querySelectorAll?.('input[type="date"]').forEach(enhance);}
+ scan(document);new MutationObserver(records=>records.forEach(r=>r.addedNodes.forEach(n=>scan(n)))).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<script>
+/* Chortkeh 1.9.3: installment allocations, shipment-aware shipping and date-scoped reports. */
+(function(){
+ const faNum=n=>new Intl.NumberFormat('fa-IR').format(Math.round(Number(n)||0));
+ const today=()=>new Date().toISOString().slice(0,10);
+ function weighted(total, items, weightFn){
+  total=Math.round(Number(total)||0);const weights=items.map((x,i)=>Math.max(0,Number(weightFn(x,i))||0));const sum=weights.reduce((a,b)=>a+b,0);
+  if(!items.length)return [];if(!sum)return items.map((_,i)=>i===0?total:0);
+  let used=0;return weights.map((w,i)=>{const v=i===weights.length-1?total-used:Math.floor(total*w/sum);used+=v;return v;});
+ }
+ function createPaymentExpenses(order,payment){
+  if(!Array.isArray(order.items)||!order.items.length)throw Error('کالاهای سفارش موجود نیستند.');
+  const items=order.items;
+  const shipByName={};(order.shipments||[]).forEach(sh=>shipByName[sh.name]=Number(sh.shipping)||0);
+  const itemWeights=items.map(it=>Number(it.amount)||0);
+  const shipShares=items.map(it=>{const ship=shipByName[it.shipment]||0;const peers=items.filter(x=>(x.shipment||'مرسوله ۱')===(it.shipment||'مرسوله ۱'));const idx=peers.indexOf(it);return weighted(ship,peers,x=>x.amount)[idx]||0;});
+  const weights=itemWeights.map((v,i)=>v+shipShares[i]);
+  const principalShares=weighted(payment.principal,items,(_,i)=>weights[i]);
+  const feeShares=weighted(payment.fee,items,(_,i)=>weights[i]);
+  const now=new Date().toISOString();
+  items.forEach((it,i)=>{
+   const amount=principalShares[i]+feeShares[i];if(!amount)return;
+   const id=payment.id+':'+i;
+   if(db.transactions.some(t=>t.id===id))return;
+   db.transactions.push({id,type:'expense',amount,title:`${order.store} · سفارش ${order.code} · ${it.title}`,category:it.ownerId?'خرید اقساطی':'هزینه جاری',subcategory:'اقساط فروشگاهی',familyMemberId:it.ownerId||null,date:payment.date,createdAt:now,updatedAt:now,installmentPaymentId:payment.id,principalAmount:principalShares[i],feeAmount:feeShares[i],shipment:it.shipment||'مرسوله ۱'});
+  });
+ }
+ window.showInstallmentSource=function(name){
+  const box=document.getElementById('installmentDetail');box.style.display='block';box.innerHTML='';
+  const h=document.createElement('h3');h.textContent=name;box.append(h);
+  if(installmentMode==='bank'){
+   const form=document.createElement('form');form.innerHTML='<div class="field"><label>تاریخ پرداخت</label><input type="date" id="bankPayDate" required></div><div class="field"><label>مبلغ پرداخت واقعی (تومان)</label><input type="number" id="bankPayAmount" min="1" required></div><div class="field"><label>توضیح</label><input id="bankPayNote"></div><button class="btn">ثبت پرداخت</button>';
+   form.querySelector('#bankPayDate').value=today();form.onsubmit=e=>{e.preventDefault();const amount=Number(form.querySelector('#bankPayAmount').value);if(!Number.isSafeInteger(amount)||amount<1)return;db.bankPayments.push({id:crypto.randomUUID(),source:name,date:form.querySelector('#bankPayDate').value,amount,note:form.querySelector('#bankPayNote').value});save();showInstallmentSource(name);render();};box.append(form);
+   const payments=db.bankPayments.filter(x=>x.source===name).sort((a,b)=>b.date.localeCompare(a.date));box.insertAdjacentHTML('beforeend','<h4>سوابق پرداخت واقعی</h4>');payments.forEach(x=>{const r=document.createElement('div');r.className='reportrow';r.textContent=displayDate(x.date)+' · '+money(x.amount)+(x.note?' · '+x.note:'');box.append(r);});return;
+  }
+  const form=document.createElement('form');
+  form.style.display='none';
+  const newOrderBtn=document.createElement('button');newOrderBtn.type='button';newOrderBtn.className='btn secondary';newOrderBtn.textContent='＋ ثبت سفارش جدید';newOrderBtn.onclick=()=>{form.style.display=form.style.display==='none'?'block':'none';newOrderBtn.textContent=form.style.display==='none'?'＋ ثبت سفارش جدید':'بستن فرم سفارش';};box.append(newOrderBtn);
+  form.innerHTML='<div class="field"><label>کد سفارش</label><input id="orderCode" required></div><h4>مرسوله‌ها و کالاهای داخل هر مرسوله</h4><div id="shipmentRows"></div><button type="button" class="btn light" id="addShipment">＋ افزودن مرسوله</button><div class="field"><label>اصل پیش‌پرداخت (تومان)</label><input id="downPrincipal" type="number" min="0" value="0"></div><div class="field"><label>کارمزد پیش‌پرداخت (تومان)</label><input id="downFee" type="number" min="0" value="0"></div><div class="field"><label>تاریخ خرید</label><input id="purchaseDate" type="date" required></div><div class="field"><label>تعداد اقساط</label><input id="installmentCount" type="number" min="1" max="60" value="1" required></div><div id="installmentPlan"></div><div class="panel" id="orderCalc"></div><button class="btn">ثبت سفارش</button>';
+  form.querySelector('#purchaseDate').value=today();form.insertAdjacentHTML('afterbegin',"<datalist id='knownGoods'><option value='شیر'><option value='دوغ'><option value='روغن'><option value='برنج'><option value='تخم‌مرغ'></datalist><datalist id='standardUnits'><option value='گرم'><option value='کیلوگرم'><option value='عدد'><option value='جفت'><option value='بسته'></datalist>");box.append(form);
+  const shipHost=form.querySelector('#shipmentRows'),plan=form.querySelector('#installmentPlan');
+  const ownerOptions='<option value="">هزینه جاری</option>'+db.familyMembers.filter(m=>!m.archivedAt).map(m=>'<option value="'+escapeHtml(m.id)+'">'+escapeHtml(m.name)+'</option>').join('');
+  function categoryOptions(){return (db.storeItemCategories||[]).map(x=>'<option>'+escapeHtml(x)+'</option>').join('');}
+  function addStoreCategory(select){const value=(prompt('نام دسته‌بندی کالای جدید:')||'').trim();if(!value)return;if(!db.storeItemCategories)db.storeItemCategories=[];if(!db.storeItemCategories.includes(value))db.storeItemCategories.push(value);save();select.innerHTML=categoryOptions()+'<option value="__add__">＋ افزودن دسته جدید…</option>';select.value=value;}
+  function addItem(itemHost){const row=document.createElement('div');row.className='panel item-row';row.style.margin='5px 0';row.innerHTML='<div class="field"><label>نام کالا</label><input class="item-title" list="knownGoods" required placeholder="مثلاً روغن، کفش یا فرش"></div><div class="field"><label>دسته‌بندی کالا</label><div class="formgrid"><select class="item-category">'+categoryOptions()+'<option value="__add__">＋ افزودن دسته جدید…</option></select><button type="button" class="btn light add-category">＋ دسته جدید</button></div></div><div class="formgrid"><div class="field"><label>تعداد</label><input class="item-count" type="number" min="1" step="1" value="1" required placeholder="مثلاً ۳"></div><div class="field"><label>مقدار هر کالا (اختیاری)</label><input class="item-qty" type="number" min="0.001" step="any" placeholder="مثلاً 750 یا 6"></div></div><div class="field"><label>واحد مقدار (اختیاری)</label><input class="item-unit" list="standardUnits" placeholder="گرم، مترمربع، لیتر، جفت..."></div><div class="field"><label>قیمت کل این ردیف (تومان)</label><input class="item-amount" type="number" min="1" required></div><div class="field"><label>صاحب هزینه</label><select class="item-owner">'+ownerOptions+'</select></div><button type="button" class="btn light remove">حذف این ردیف</button>';const cat=row.querySelector('.item-category');cat.addEventListener('change',()=>{if(cat.value==='__add__')addStoreCategory(cat);});row.querySelector('.add-category').onclick=()=>addStoreCategory(cat);row.querySelector('.remove').onclick=()=>{row.remove();refreshCalc();};itemHost.append(row);}
+  function addShipment(name='مرسوله '+(shipHost.children.length+1),cost=0){const row=document.createElement('section');row.className='panel shipment-card';row.style.margin='9px 0';row.innerHTML='<div class="field"><label>عنوان مرسوله</label><input class="ship-name" required></div><div class="shipment-items"></div><button type="button" class="btn secondary add-item">＋ افزودن کالا به این مرسوله</button><div class="field" style="margin-top:10px"><label>هزینه ارسال کل این مرسوله (تومان)</label><input class="ship-cost" type="number" min="0" value="0"></div><button type="button" class="btn light remove-shipment">حذف مرسوله</button>';row.querySelector('.ship-name').value=name;row.querySelector('.ship-cost').value=cost;row.querySelector('.add-item').onclick=()=>addItem(row.querySelector('.shipment-items'));row.querySelector('.remove-shipment').onclick=()=>{if(shipHost.children.length===1){alert('هر سفارش باید حداقل یک مرسوله داشته باشد.');return;}row.remove();refreshCalc();};row.querySelector('.ship-cost').addEventListener('input',refreshCalc);shipHost.append(row);addItem(row.querySelector('.shipment-items'));}
+  function rows(){return [...shipHost.children].flatMap(sh=>[...sh.querySelectorAll('.item-row')].map(n=>({node:n,title:n.querySelector('.item-title').value.trim(),category:n.querySelector('.item-category').value,quantity:Number(n.querySelector('.item-qty').value)||0,unit:n.querySelector('.item-unit').value.trim(),count:Number(n.querySelector('.item-count').value)||1,amount:Number(n.querySelector('.item-amount').value)||0,ownerId:n.querySelector('.item-owner').value||null,shipment:sh.querySelector('.ship-name').value.trim()})));}
+  function shipmentData(){return [...shipHost.children].map(n=>({name:n.querySelector('.ship-name').value.trim(),shipping:Number(n.querySelector('.ship-cost').value)||0}));}
+    function refreshPlan(){plan.innerHTML='';const count=Math.min(60,Math.max(1,Number(form.querySelector('#installmentCount').value)||1));const mode=document.createElement('div');mode.className='field';mode.innerHTML='<label>روش ثبت اقساط</label><select id="installmentModeChoice"><option value="equal">اقساط با مبالغ یکسان</option><option value="manual">افزودن دستی اقساط</option></select>';plan.append(mode);const body=document.createElement('div');body.id='installmentPlanRows';plan.append(body);const addMonth=(i)=>{const d=new Date();d.setMonth(d.getMonth()+i);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};function makeRow(i,p=0,f=0,m=addMonth(i)){const r=document.createElement('div');r.className='panel';r.style.margin='5px 0';r.innerHTML='<b>قسط '+faNum(i)+'</b><div class="formgrid"><div class="field"><label>اصل قسط (تومان)</label><input class="plan-principal" type="number" min="0" value="'+p+'" required></div><div class="field"><label>کارمزد قسط (تومان)</label><input class="plan-fee" type="number" min="0" value="'+f+'"></div></div><div class="field"><label>ماه برنامه‌ریزی‌شده قسط</label><input class="plan-month" type="month" required value="'+m+'"></div>';body.append(r);}
+    function build(){body.innerHTML='';if(mode.querySelector('select').value==='equal'){const fields=document.createElement('div');fields.innerHTML='<div class="formgrid"><div class="field"><label>اصل هر قسط (تومان)</label><input id="equalPrincipal" type="number" min="0" value="0"></div><div class="field"><label>کارمزد هر قسط (تومان)</label><input id="equalFee" type="number" min="0" value="0"></div></div><div class="field"><label>ماه اولین قسط</label><input id="equalFirstMonth" type="month" required value="'+addMonth(1)+'"></div><div class="muted">مبالغ بالا برای '+faNum(count)+' قسط یکسان ثبت می‌شوند.</div>';body.append(fields);fields.addEventListener('input',refreshCalc);}else{for(let i=1;i<=count;i++)makeRow(i);}refreshCalc();}
+    mode.querySelector('select').addEventListener('change',build);build();plan.dataset.getPlans='';plan._getPlans=()=>{if(mode.querySelector('select').value==='manual')return [...body.children].map((n,i)=>({number:i+1,principal:Number(n.querySelector('.plan-principal').value)||0,fee:Number(n.querySelector('.plan-fee').value)||0,plannedMonth:n.querySelector('.plan-month').value,paid:false,paidDate:null}));const p=Number(body.querySelector('#equalPrincipal').value)||0,f=Number(body.querySelector('#equalFee').value)||0,first=body.querySelector('#equalFirstMonth').value;return Array.from({length:count},(_,i)=>{const d=new Date((first||addMonth(1))+'-01T12:00:00');d.setMonth(d.getMonth()+i);return {number:i+1,principal:p,fee:f,plannedMonth:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),paid:false,paidDate:null};});};refreshCalc();}
+  function refreshCalc(){const goods=rows(),shipping=shipmentData().reduce((a,x)=>a+x.shipping,0),base=goods.reduce((a,x)=>a+x.amount,0)+shipping;const down=Number(form.querySelector('#downPrincipal').value)||0;const installments=(plan._getPlans?plan._getPlans():[]).reduce((a,n)=>a+n.principal,0);form.querySelector('#orderCalc').innerHTML='<b>جمع کالاها و ارسال: '+money(base)+'</b><div class="muted">اصل پیش‌پرداخت + اصل اقساط باید برابر این مبلغ باشد.</div><div>اصل پیش‌پرداخت و اقساط: '+money(down+installments)+'</div><div>کارمزد پیش‌پرداخت: '+money(form.querySelector('#downFee').value)+'</div><div>کارمزد اقساط: '+money((plan._getPlans?plan._getPlans():[]).reduce((a,n)=>a+n.fee,0))+'</div>';}
+  form.querySelector('#addShipment').onclick=()=>addShipment();form.querySelector('#installmentCount').onchange=refreshPlan;form.addEventListener('input',refreshCalc);addShipment();refreshPlan();
+  form.onsubmit=e=>{e.preventDefault();const goods=rows(),shipments=shipmentData(),plans=plan._getPlans(),count=plans.length,down=Number(form.querySelector('#downPrincipal').value)||0,downFee=Number(form.querySelector('#downFee').value)||0,principal=goods.reduce((a,x)=>a+x.amount,0)+shipments.reduce((a,x)=>a+x.shipping,0);
+   if(!goods.length||goods.some(x=>!x.title||!Number.isSafeInteger(x.count)||x.count<1||((x.quantity>0)&&!x.unit)||(!Number.isFinite(x.quantity))||!Number.isSafeInteger(x.amount)||x.amount<1)){alert('نام کالا، تعداد و قیمت هر ردیف را درست وارد کن؛ اگر مقدار وارد می‌کنی، واحد آن را هم مشخص کن.');return;}
+   if(shipments.some(x=>!x.name)||new Set(shipments.map(x=>x.name)).size!==shipments.length){alert('نام مرسوله‌ها باید خالی یا تکراری نباشد.');return;}
+   if(shipHost.children.length!==shipments.length||[...shipHost.children].some(sh=>!sh.querySelector('.item-row'))){alert('هر مرسوله باید حداقل یک کالا داشته باشد.');return;}
+   if(goods.some(x=>!shipments.some(sh=>sh.name===x.shipment))){alert('برای هر کالا یک مرسوله معتبر انتخاب کن.');return;}
+   if(down+plans.reduce((a,x)=>a+x.principal,0)<=0){alert('مبلغ پیش‌پرداخت یا مجموع اصل اقساط باید بیشتر از صفر باشد.');return;}
+   const code=form.querySelector('#orderCode').value.trim();if(db.installmentOrders.some(o=>o.store===name&&o.code===code)){alert('این کد سفارش قبلاً ثبت شده است.');return;}
+   const order={id:crypto.randomUUID(),store:name,code,items:goods.map(({node,...x})=>x),shipments,shipping:shipments.reduce((a,x)=>a+x.shipping,0),total:principal+downFee+plans.reduce((a,x)=>a+x.fee,0),principalTotal:principal,downPayment:down,downFee,purchaseDate:form.querySelector('#purchaseDate').value,installments:plans,payments:[],settled:false};db.installmentOrders.push(order);
+   if(down+downFee>0){const payment={id:crypto.randomUUID(),kind:'down',date:order.purchaseDate,principal:down,fee:downFee};order.payments.push(payment);createPaymentExpenses(order,payment);}
+   save();showInstallmentSource(name);render();
+  };
+  const orders=db.installmentOrders.filter(o=>o.store===name);const paidOf=o=>{if(Array.isArray(o.payments)&&o.payments.length)return o.payments.reduce((a,p)=>a+(Number(p.principal)||0)+(Number(p.fee)||0),0);return (o.installments||[]).filter(x=>x.paid).reduce((a,x)=>a+(Number(x.principal??x.amount)||0)+(Number(x.fee)||0),0)+(Number(o.downPayment)||0)+(Number(o.downFee)||0);};const totalPaid=orders.reduce((a,o)=>a+paidOf(o),0);const summary=document.createElement('div');summary.className='panel';summary.style.margin='10px 0';const countRow=document.createElement('button');countRow.type='button';countRow.className='reportrow';countRow.style.cssText='width:100%;border:0;background:transparent;text-align:right;font:inherit;cursor:pointer';countRow.innerHTML='<b>تعداد سفارش‌ها</b><b>'+faNum(orders.length)+'  ▾</b>';const totalRow=document.createElement('div');totalRow.className='reportrow';totalRow.innerHTML='<span>مجموع پرداخت واقعی</span><b>'+money(totalPaid)+'</b>';summary.append(countRow,totalRow);const list=document.createElement('div');list.style.display='none';countRow.onclick=()=>{list.style.display=list.style.display==='none'?'block':'none';countRow.querySelectorAll('b')[1].textContent=faNum(orders.length)+(list.style.display==='none'?'  ▾':'  ▴');};orders.forEach(o=>{if(!Array.isArray(o.payments))o.payments=[];if(!Array.isArray(o.installments))o.installments=[];const card=document.createElement('div');card.className='panel';card.style.margin='8px 0';const head=document.createElement('b');head.textContent='کد سفارش '+o.code;const paid=document.createElement('div');paid.className='reportrow';paid.innerHTML='<span>مبلغ پرداخت‌شده</span><b>'+money(paidOf(o))+'</b>';const items=document.createElement('div');items.className='muted';items.style.marginTop='6px';items.textContent='اقلام خریداری‌شده: '+(o.items||[]).map(it=>it.title+' ('+faNum(it.count||1)+' عدد'+(it.quantity?'؛ '+faNum(it.quantity)+(it.unit?' '+it.unit:'')+' برای هر کالا':'')+')').join('، ');card.append(head,paid,items);list.append(card);});box.append(summary,list);
+ };
+ // Report period controls apply consistently to category and member reports.
+ const reportPanel=document.querySelector('#reportPage .panel');if(reportPanel&&!document.getElementById('reportPeriod')){const bar=document.createElement('div');bar.id='reportPeriod';bar.className='panel';bar.style.marginBottom='10px';bar.innerHTML='<b>بازه گزارش</b><div class="field"><label>از تاریخ</label><input id="reportFrom" type="date"></div><div class="field"><label>تا تاریخ</label><input id="reportTo" type="date"></div><button class="btn light" id="reportAllTime" type="button">کل سوابق</button>';reportPanel.parentNode.insertBefore(bar,reportPanel);bar.querySelector('#reportAllTime').onclick=()=>{bar.querySelector('#reportFrom').value='';bar.querySelector('#reportTo').value='';renderReports();};bar.addEventListener('change',renderReports);}
+ const originalRenderReports=window.renderReports;
+ window.renderReports=function(){const from=document.getElementById('reportFrom')?.value||'',to=document.getElementById('reportTo')?.value||'';if(from&&to&&from>to){document.getElementById('reportHint').textContent='تاریخ شروع نباید بعد از تاریخ پایان باشد.';return;}if(!from&&!to){return originalRenderReports();}
+  const filtered=db.transactions.filter(t=>t.type==='expense'&&(!from||t.date>=from)&&(!to||t.date<=to));const el=document.getElementById('reportContent');el.innerHTML='';
+  if(reportMode==='members'){
+   if(!reportPath.length){[...db.familyMembers.map(m=>({id:m.id,name:m.name})),{id:'__none__',name:'بدون انتساب'}].forEach(g=>{const a=filtered.filter(t=>g.id==='__none__'?!t.familyMemberId:t.familyMemberId===g.id);const row=document.createElement('div');row.className='reportrow';row.innerHTML='<b>'+escapeHtml(g.name)+'</b><b>'+money(a.reduce((s,t)=>s+t.amount,0))+' ‹</b>';row.onclick=()=>{reportPath=[g.id];renderReports();};el.append(row);});return;}
+   const [id,cat]=reportPath;const a=filtered.filter(t=>id==='__none__'?!t.familyMemberId:t.familyMemberId===id);const back=document.createElement('button');back.className='back';back.textContent='← بازگشت';back.onclick=()=>{reportPath=[];renderReports();};el.append(back);
+   if(!cat){[...new Set(a.map(t=>t.category))].forEach(c=>{const xs=a.filter(t=>t.category===c),r=document.createElement('div');r.className='reportrow';r.innerHTML='<b>'+escapeHtml(c)+'</b><b>'+money(xs.reduce((s,t)=>s+t.amount,0))+' ‹</b>';r.onclick=()=>{reportPath=[id,c];renderReports();};el.append(r);});}else a.filter(t=>t.category===cat).forEach(t=>el.append(txNode(t)));return;
+  }
+  if(!reportPath.length){[...new Set([...allCats(true),...filtered.map(t=>t.category)])].forEach(c=>{const a=filtered.filter(t=>t.category===c),r=document.createElement('div');r.className='reportrow';r.innerHTML='<b>'+escapeHtml(c)+'</b><b>'+money(a.reduce((s,t)=>s+t.amount,0))+' ‹</b>';r.onclick=()=>{reportPath=[c];renderReports();};el.append(r);});}else{const c=reportPath[0],back=document.createElement('button');back.className='back';back.textContent='← بازگشت';back.onclick=()=>{reportPath=[];renderReports();};el.append(back);filtered.filter(t=>t.category===c).forEach(t=>el.append(txNode(t)));}
+ };
+ // Keep new payment records available to all report views without counting payment twice.
+ try{renderReports();}catch(e){console.warn('Chortkeh report refresh:',e);}
+})();
+</script>
+
+
+<script>
+/* Chortkeh PWA bootstrap. Safe to run in browsers without install support. */
+(function(){
+  const installBtn = document.getElementById('installAppBtn');
+  const installHelp = document.getElementById('installHelp');
+  let installPrompt = null;
+  const standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+  if (standalone || window.navigator.standalone) {
+    if (installBtn) installBtn.textContent = '✓ چرتکه نصب شده است';
+    if (installBtn) installBtn.disabled = true;
+    if (installHelp) installHelp.textContent = 'برنامه از صفحه اصلی گوشی اجرا شده است.';
+  }
+  window.addEventListener('beforeinstallprompt', function(event){
+    event.preventDefault();
+    installPrompt = event;
+    if (installBtn) { installBtn.disabled = false; installBtn.textContent = '＋ نصب چرتکه'; }
+    if (installHelp) installHelp.textContent = 'آماده نصب روی صفحه اصلی گوشی است.';
+  });
+  if (installBtn) installBtn.addEventListener('click', async function(){
+    if (!installPrompt) {
+      if (installHelp) installHelp.textContent =
+        /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        ? 'در Safari دکمه اشتراک‌گذاری را بزن و سپس «Add to Home Screen» را انتخاب کن.'
+        : 'از منوی مرورگر گزینه «افزودن به صفحه اصلی» یا «Install app» را انتخاب کن. اگر این گزینه را نمی‌بینی، ابتدا برنامه را از یک نشانی HTTPS باز کن.';
+      return;
+    }
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+  });
+  window.addEventListener('appinstalled', function(){
+    if (installBtn) { installBtn.textContent = '✓ چرتکه نصب شد'; installBtn.disabled = true; }
+    if (installHelp) installHelp.textContent = 'اکنون می‌توانی چرتکه را از صفحه اصلی گوشی باز کنی.';
+  });
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./service-worker.js').catch(function(err){
+        console.warn('Chortkeh service worker registration failed:', err);
+      });
+    });
+  } else if (installHelp && location.protocol === 'file:') {
+    installHelp.textContent = 'برای نصب PWA باید فایل‌ها روی یک میزبان HTTPS قرار بگیرند؛ بازکردن مستقیم فایل HTML کافی نیست.';
+  }
+})();
+</script>
+
+<style>
+#chortkehLock{position:fixed;inset:0;z-index:99999;background:linear-gradient(145deg,#1d3471,#315efb);display:none;align-items:center;justify-content:center;padding:22px}#chortkehLock.show{display:flex}#chortkehLock .lockbox{width:min(390px,100%);background:#fff;border-radius:22px;padding:24px;box-shadow:0 18px 60px #07183d55;text-align:center}#chortkehLock h2{margin:0 0 8px;color:#17243b}#chortkehLock p{color:#7b879b;line-height:2;font-size:12px}#chortkehPin{width:100%;padding:15px;border:1px solid #dfe5ef;border-radius:12px;text-align:center;font-size:24px;letter-spacing:8px;margin:10px 0 12px}#chortkehLockError{min-height:24px;color:#d93652;font-size:12px}body.chortkeh-locked{overflow:hidden}
+</style>
+<div id="chortkehLock" role="dialog" aria-modal="true" aria-labelledby="chortkehLockTitle">
+ <div class="lockbox"><div style="font-size:34px">🔒</div><h2 id="chortkehLockTitle">چرتکه قفل است</h2><p id="chortkehLockDesc">برای ورود، رمز خود را وارد کن.</p><form id="chortkehLockForm"><input id="chortkehPin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" autocomplete="off" aria-label="رمز ۴ تا ۶ رقمی" required><div id="chortkehLockError" aria-live="polite"></div><button class="btn" id="chortkehLockSubmit" type="submit" style="width:100%">بازکردن چرتکه</button><button class="btn light" id="chortkehLockCancel" type="button" style="width:100%;margin-top:8px;display:none">انصراف</button></form></div>
+</div>
+<script>
+/* Chortkeh 1.9.12 local PIN gate. PIN hash is stored separately from app data. */
+(function(){
+ 'use strict';
+ const CFG='chortkeh_pin_lock_v1', TIME='chortkeh_pin_timeout_v1', IDLE_DEFAULT=3*60*1000;
+ const overlay=document.getElementById('chortkehLock'),form=document.getElementById('chortkehLockForm'),pin=document.getElementById('chortkehPin'),title=document.getElementById('chortkehLockTitle'),desc=document.getElementById('chortkehLockDesc'),error=document.getElementById('chortkehLockError'),submit=document.getElementById('chortkehLockSubmit'),cancel=document.getElementById('chortkehLockCancel');
+ const enable=document.getElementById('enablePinBtn'),change=document.getElementById('changePinBtn'),lockNow=document.getElementById('lockNowBtn'),disable=document.getElementById('disablePinBtn'),timeout=document.getElementById('lockTimeout'),status=document.getElementById('securityStatus');
+ if(!overlay||!form||!enable)return;
+ let config=null,mode='unlock',unlocked=true,idleTimer=null,tries=0,cooldownUntil=0,pendingPin='',flow='';
+ const read=()=>{try{return JSON.parse(localStorage.getItem(CFG)||'null')}catch(_){return null}};
+ const b64=a=>btoa(String.fromCharCode(...a));
+ const un64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+ async function hashPin(value,salt){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(value),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:210000,hash:'SHA-256'},material,256);return b64(new Uint8Array(bits));}
+ function refresh(){const active=!!read();enable.disabled=active;change.disabled=!active;lockNow.disabled=!active;disable.disabled=!active;status.textContent=active?'قفل با رمز فعال است.':'قفل غیرفعال است.';timeout.value=localStorage.getItem(TIME)||'3';}
+ function show(next,canCancel=false){mode=next;overlay.classList.add('show');document.body.classList.add('chortkeh-locked');pin.value='';error.textContent='';cancel.style.display=canCancel?'block':'none';if(next==='setup'){title.textContent='ساخت رمز چرتکه';desc.textContent='یک رمز ۴ تا ۶ رقمی انتخاب کن.';submit.textContent='ادامه';}else if(next==='confirm'){title.textContent='تأیید رمز';desc.textContent='همان رمز را دوباره وارد کن.';submit.textContent='فعال‌سازی رمز';}else if(next==='change'){title.textContent='تأیید رمز فعلی';desc.textContent='برای تغییر تنظیمات، رمز فعلی را وارد کن.';submit.textContent='ادامه';}else if(next==='disable'){title.textContent='غیرفعال‌کردن قفل';desc.textContent='برای غیرفعال‌کردن قفل، رمز فعلی را وارد کن.';submit.textContent='غیرفعال‌کردن';}else{title.textContent='چرتکه قفل است';desc.textContent='برای ورود، رمز خود را وارد کن.';submit.textContent='بازکردن چرتکه';}setTimeout(()=>pin.focus(),100);}
+ function hide(){overlay.classList.remove('show');document.body.classList.remove('chortkeh-locked');unlocked=true;pin.value='';refresh();resetIdle();}
+ function lock(){if(!read())return;unlocked=false;clearTimeout(idleTimer);show('unlock');}
+ function resetIdle(){clearTimeout(idleTimer);if(unlocked&&read())idleTimer=setTimeout(lock,Math.max(1,Number(localStorage.getItem(TIME)||3))*60000);}
+ async function savePin(value){const salt=crypto.getRandomValues(new Uint8Array(16));config={salt:b64(salt),hash:await hashPin(value,salt),updatedAt:Date.now()};localStorage.setItem(CFG,JSON.stringify(config));}
+ async function verify(value){const c=read();if(!c||!c.salt||!c.hash)return false;return (await hashPin(value,un64(c.salt)))===c.hash;}
+ form.addEventListener('submit',async e=>{e.preventDefault();const value=pin.value;if(!/^\d{4,6}$/.test(value)){error.textContent='رمز باید ۴ تا ۶ رقم باشد.';return;}if(Date.now()<cooldownUntil){error.textContent='لطفاً ۳۰ ثانیه صبر کن.';return;}submit.disabled=true;try{if(mode==='setup'){pendingPin=value;show('confirm',true);}else if(mode==='confirm'){if(value!==pendingPin){error.textContent='دو رمز یکسان نیستند.';return;}await savePin(value);pendingPin='';hide();}else if(mode==='unlock'){if(await verify(value)){tries=0;hide();}else{tries++;error.textContent='رمز اشتباه است.'+(tries>=5?' ۳۰ ثانیه قفل شد.':'');if(tries>=5){cooldownUntil=Date.now()+30000;tries=0;}}}else if(mode==='change'){if(await verify(value)){flow='change';show('setup',true);}else error.textContent='رمز فعلی اشتباه است.';}else if(mode==='disable'){if(await verify(value)){localStorage.removeItem(CFG);hide();}else error.textContent='رمز فعلی اشتباه است.';}}catch(err){error.textContent='امکان انجام عملیات امنیتی در این مرورگر وجود ندارد.';console.error(err);}finally{submit.disabled=false;}});
+ cancel.addEventListener('click',()=>{pendingPin='';if(mode==='confirm'||mode==='setup'||mode==='change'){hide();}});
+ enable.addEventListener('click',()=>{if(!window.crypto||!crypto.subtle){alert('مرورگر فعلی از رمزنگاری لازم پشتیبانی نمی‌کند. چرتکه را از نشانی HTTPS باز کن.');return;}show('setup');});
+ change.addEventListener('click',()=>show('change'));lockNow.addEventListener('click',lock);disable.addEventListener('click',()=>show('disable'));
+ timeout.addEventListener('change',()=>{localStorage.setItem(TIME,String(timeout.value));resetIdle();});
+ ['pointerdown','keydown','touchstart','click'].forEach(ev=>document.addEventListener(ev,resetIdle,{passive:true}));
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&read())lock();});
+ window.addEventListener('pageshow',()=>{if(read()&&!unlocked)show('unlock');});
+ refresh();if(read()){unlocked=false;show('unlock');}else resetIdle();
+})();
+</script>
+</body></html>
